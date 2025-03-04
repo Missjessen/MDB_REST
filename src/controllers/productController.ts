@@ -67,7 +67,7 @@ export async function getProductById(req: Request, res: Response) {
         await connect();
 
     const id = req.params.id;
-    const result = await productModel.find({_id: id});
+    const result = await productModel.findById(id);
 
         res.status(200).send(result);
     }
@@ -136,3 +136,35 @@ export async function deleteProductsById(req: Request, res: Response) {
         await disconnect();
     }
 }  
+
+
+
+/**
+ * update  products by id from the database
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ */
+
+export async function getProductsByQuery(req: Request, res: Response) {
+
+    const key = req.params.key;
+    const value = req.params.value;
+    
+    try {
+        await connect();
+
+   
+    const result = await productModel.find({ [key]: { $regex: value, $options: 'i' } }) ;
+   
+    if (!result) {
+
+        res.status(200).send('Product by query found');
+    }
+
+    
+    } catch (error) {
+        res.status(500).send("Product by query found . error: " + error);
+    } finally {
+        await disconnect();
+    }
+}   
