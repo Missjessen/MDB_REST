@@ -13,8 +13,8 @@ const app: Application = express();
 function corsSetup() {
     
 app.use(cors({
-    origin: "http://localhost:5173",  // Tillad requests fra din frontend
-    //  origin: '*',  // Tillad requests fra din frontend
+   // origin: "http://localhost:5173",  // Tillad requests fra din frontend
+    origin: '*',  // Tillad requests fra din frontend
     methods: "GET,POST,PUT,DELETE,OPTIONS, HEAD", 
     allowedHeaders: ['Content-Type', 'Authorization', 'auth-token', 'Origin', 'X-Requested-With', 'Accept'],// **Tilføj auth-token**
     credentials: true
