@@ -8,7 +8,7 @@ import { Application } from 'express';
  */
 
 export function setupSwagger(app: Application) {
-    // Extended: https://swagger.io/specification/#infoObject
+   
 
     // Swagger definition
     const swaggerDefinition = {
@@ -20,7 +20,7 @@ export function setupSwagger(app: Application) {
         },
         servers: [
             {
-                url: 'http://localhost:3000',
+                url: 'http://localhost:4000',
                 description: 'Development server',
             },
         ],
@@ -33,7 +33,7 @@ export function setupSwagger(app: Application) {
                 },
             },
             schemas: {  // Rettet fra "schema" til "schemas"
-                product: {
+                Product: {
                     type: 'object',
                     properties: {
                         name: { type: 'string' },
@@ -47,7 +47,7 @@ export function setupSwagger(app: Application) {
                         _createdBy: { type: 'string' },
                     },
                 },
-                user: {
+                User: {
                     type: 'object',
                     properties: {
                         name: { type: 'string' },
@@ -55,7 +55,7 @@ export function setupSwagger(app: Application) {
                         password: { type: 'string' },
                     },
                 },
-                event: {
+                Event: {
                     type: 'object',
                     properties: {
                         title: { type: 'string' },
@@ -70,7 +70,7 @@ export function setupSwagger(app: Application) {
                 },
             }, // Lukkede "schemas" objektet korrekt
         }, // Lukkede "components" objektet korrekt
-    }; // Lukkede "swaggerDefinition" objektet korrekt
+    }; 
 
     // Options for the swagger docs
     const options = {

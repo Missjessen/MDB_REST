@@ -162,6 +162,8 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
         res.status(400).send("Invalid Token");
     }
 }
+
+
     
 
 /**
@@ -177,5 +179,7 @@ export function validateUserLoginInfo(data: User): ValidationResult {
         password: Joi.string().min(6).max(30).required()
     });
 
+
     return schema.validate(data);
 }
+

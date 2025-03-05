@@ -5,6 +5,8 @@ import path from "path";
 import cors from "cors";  // Import CORS
 import { testConnection } from "./repository/database";
 import router from "./routes";
+import { setupSwagger } from "./util/documentationSwag";
+
 
 dotenvFlow.config();
 
@@ -72,6 +74,8 @@ app.use(express.json()); // Aktiver JSON parsing i Express
 
     // Bind router to app
 app.use("/api", router);
+
+setupSwagger(app);
 
     const PORT: number = parseInt(process.env.PORT as string) || 4000;
 
