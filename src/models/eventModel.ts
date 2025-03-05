@@ -8,6 +8,7 @@ const eventSchema = new Schema<Event>({
     description: { type: String, required: false, min: 6, max: 1024 },
     maxAttendees: { type: Number, required: true },
     attendees: { type: [String], required: false },
+    imageURL: { type: String, required: false },
     createdBy: { type: String, ref: 'User', required: true }
 });
 

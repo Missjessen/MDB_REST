@@ -8,5 +8,6 @@ export interface Event extends Document {
     description: string;
     maxAttendees: number;
     attendees: string[];
+    imageURL: string;
     createdBy: User ['id'];
 }

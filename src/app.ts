@@ -1,5 +1,7 @@
-import express, { Application } from "express";
+import express, { Application, Request, Response } from "express";
 import dotenvFlow from "dotenv-flow";
+import multer from "multer";
+import path from "path";
 import cors from "cors";  // Import CORS
 import { testConnection } from "./repository/database";
 import router from "./routes";
@@ -20,6 +22,37 @@ app.use(cors({
     credentials: true
 }))
 };
+
+
+// **Middleware**
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// **Multer konfiguration til filupload**
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
+
+// **Endpoint til billedupload**
+app.post('/upload', upload.single('image'), async (req: Request, res: Response): Promise<void> => {
+    if (!req.file) {
+      res.status(400).json({ message: 'No file uploaded' });
+      return;
+    }
+    res.json({ imageUrl: `/uploads/${req.file.filename}` });
+  });
+
+// **Gør uploads-mappen offentligt tilgængelig**
+app.use('/uploads', express.static('uploads'));
+
 
 
 // Start server funktion
