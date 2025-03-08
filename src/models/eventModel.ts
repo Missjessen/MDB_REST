@@ -8,7 +8,7 @@ const eventSchema = new Schema<Event>({
     description: { type: String, required: false, min: 6, max: 1024 },
     maxAttendees: { type: Number, required: true },
     attendees: { type: [String], required: false },
-    imageURL: { type: String, required: false },
+    imageURL: { type: String, required: false },  // Tilføj denne linje
     createdBy: { type: String, ref: 'User', required: true }
 });
 
@@ -20,7 +20,6 @@ type UpdateQuery<T> = {
     $setOnInsert?: Partial<T> & { __v?: number };
     $inc?: { __v?: number };
 };
-
 
 eventSchema.pre('findOneAndUpdate', function <T extends Document>(this: any) {
     const update = this.getUpdate() as UpdateQuery<T>;

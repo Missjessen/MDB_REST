@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 import dotenvFlow from "dotenv-flow";
-import uploadRoute from './uploadRoute';
+import uploadRoute from './uploadRoute'; // Her importeres `uploadRoute`
 import cors from "cors";  // Import CORS
 import { testConnection } from "./repository/database";
 import router from "./routes";
@@ -29,8 +29,6 @@ app.use(cors({
 app.use(express.json());
 
 
-app.use('/api/upload', uploadRoute);
-
 // Start server funktion
 export function startServer() {
     testConnection();
@@ -48,6 +46,9 @@ app.use(express.json()); // Aktiver JSON parsing i Express
 
     // Bind router to app
 app.use("/api", router);
+
+  // **Inkluder uploadRoute**
+  app.use("/api/upload", uploadRoute); // ✅ Placer upload-ruten her
 
 setupSwagger(app);
 
