@@ -1,12 +1,12 @@
 import express, { Request, Response, Router } from 'express';
-import cloudinary from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 import { eventModel } from './models/eventModel'; // Opdateret import for eventSchema
 import * as streamifier from 'streamifier';
 
 const router: Router = express.Router();
 
 // Cloudinary konfiguration
-cloudinary.v2.config({
+cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
@@ -23,7 +23,12 @@ router.post('/upload', async (req: Request, res: Response) => {
     req.on('end', async () => {
         const buffer = Buffer.concat(chunks);
 
-        const uploadStream = cloudinary.v2.uploader.upload_stream(
+        // Tjek om der faktisk er data i bufferen
+        if (!buffer.length) {
+            return res.status(400).json({ error: 'Ingen data modtaget til upload.' });
+        }
+
+        const uploadStream = cloudinary.uploader.upload_stream(
             { folder: 'event-images' },
             async (error, result) => {
                 if (error) {
@@ -32,15 +37,17 @@ router.post('/upload', async (req: Request, res: Response) => {
                 }
 
                 try {
-                    // Opret nyt event og gem imageURL
+                    const { title, date, eventlocation, description, maxAttendees, createdBy } = req.body;
+
+                    // Opret nyt event med data fra request body
                     const newEvent = await eventModel.create({
-                        title: "Eksempel Event",
-                        date: new Date(),
-                        eventlocation: "Eksempel Sted",
-                        description: "Dette er et testevent",
-                        maxAttendees: 100,
+                        title: title || "Ukendt Event",
+                        date: date || new Date(),
+                        eventlocation: eventlocation || "Ukendt Sted",
+                        description: description || "Ingen beskrivelse angivet",
+                        maxAttendees: maxAttendees || 100,
                         imageURL: result?.secure_url,
-                        createdBy: "user123"  // Erstat evt. med dynamisk ID fra brugerens login
+                        createdBy: createdBy || "ukendt-bruger"
                     });
 
                     res.json({
