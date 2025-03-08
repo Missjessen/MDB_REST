@@ -94,23 +94,62 @@ export async function getEventById(req: Request, res: Response) {
     }
 }
 
+
+// /* /**
+//  * Update a event in the database
+//  * @param {Request} req - The request object
+//  * @param {Response} res - The response object
+//  */
+
+// export async function updateEvent(req: Request, res: Response) {
+//     try {
+//         await connect();
+//         const result = await eventModel.findByIdAndUpdate(req.params.id, req.body);
+//         res.status(200).send(result);
+//     }
+//     catch (error){
+//         res.status(500).send("Error updating event . error: " + error);
+//     }
+//     finally {
+//         await disconnect();
+//     }
+// } */
+
 /**
- * Update a event in the database
+ * Update a specific event in the database
  * @param {Request} req - The request object
  * @param {Response} res - The response object
  */
-
-export async function updateEvent(req: Request, res: Response) {
+export async function updateEvent(req: Request, res: Response): Promise<void>   {
     try {
         await connect();
-        const result = await
-        eventModel.findByIdAndUpdate
-        (req.params.id, req.body);
-        res.status(200).send(result);
-    }
-    catch (error){
-        res.status(500).send("Error updating event . error: " + error);
-    }
+
+        // Find eksisterende event
+        const existingEvent = await eventModel.findById(req.params.id);
+
+
+        if (!existingEvent) {
+            res.status(404).send({ message: "Event not found" });
+            return;
+        }
+
+
+
+        // Opdater event med de nye data
+        const updatedEvent = await eventModel.findByIdAndUpdate(
+            req.params.id,
+            { $set: req.body },   // $set sikrer kun de felter, der ændres
+            { new: true, runValidators: true } // Returnér den opdaterede version og valider data
+        );
+
+        res.status(200).send({
+            message: "Event updated successfully",
+            updatedEvent
+        });
+    } 
+    catch (error) {
+        res.status(500).send("Error Event not updated by id . error: " + error);
+    } 
     finally {
         await disconnect();
     }
@@ -122,35 +161,7 @@ export async function updateEvent(req: Request, res: Response) {
  * @param {Response} res - The response object
  */
 
-/* export async function deleteEvent(req: Request, res: Response) {
-    try {
-        await connect();
-        const result = await
-        eventModel.findByIdAndDelete
-        (req.params.id);
-        res.status(200).send(result);
-    }
-    catch (error){
-        res.status(500).send("Error deleting event . error: " + error);
-    }
-    finally {
-        await disconnect();
-    }
 
-} */
-
-/* export async function deleteEvent(req: Request, res: Response): Promise<void> {
-    try {
-        await connect();
-        const deletedEvent = await eventModel.findByIdAndDelete(req.params.id);
-        if (!deletedEvent) return res.status(404).json({ error: "Event ikke fundet" });
-        res.status(200).json({ message: "Event slettet" });
-    } catch (error) {
-        res.status(500).json({ error: "Fejl ved sletning af event", details: error });
-    } finally {
-        await disconnect();
-    }
-} */
 
 export async function deleteEventById(req: Request, res: Response) {
 

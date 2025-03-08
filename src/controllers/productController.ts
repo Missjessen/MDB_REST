@@ -125,7 +125,7 @@ export async function deleteProductsById(req: Request, res: Response) {
    
     const result = await productModel.findByIdAndDelete(id) ;
     if (!result) {
-        res.status(404).send("Product delete products with id =" + id);
+        res.status(404).send("Product not found with id =" + id);
     }
     else {
         res.status(200).send('Product deleted successfully');

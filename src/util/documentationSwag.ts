@@ -20,8 +20,12 @@ export function setupSwagger(app: Application) {
         },
         servers: [
             {
-                url: 'http://localhost:4000',
+                url: 'http://localhost:4000/api/',
                 description: 'Development server',
+            },
+            {
+                url: 'https://mdb-rest.onrender.com/api/',
+                description: 'Remote render.com server',
             },
         ],
         components: {
@@ -32,20 +36,22 @@ export function setupSwagger(app: Application) {
                     name: 'auth-token',
                 },
             },
-            schemas: {  // Rettet fra "schema" til "schemas"
+            schemas: {  
                 Product: {
                     type: 'object',
-                    properties: {
-                        name: { type: 'string' },
-                        description: { type: 'string' },
-                        imageURL: { type: 'string' },
-                        price: { type: 'number' },
-                        stock: { type: 'number' },
-                        isONdiscount: { type: 'boolean' },
-                        discountPct: { type: 'number' },
-                        isHidden: { type: 'boolean' },
-                        _createdBy: { type: 'string' },
-                    },
+                  properties: {
+                            name: { type: 'string', example: 'Smartphone X' },
+                            description: { type: 'string', example: 'High-end smartphone with 256GB storage' },
+                            imageURL: { type: 'string', example: 'https://example.com/image.jpg' },
+                            price: { type: 'number', example: 999.99 },
+                            stock: { type: 'number', example: 50 },
+                            isONdiscount: { type: 'boolean', example: true },
+                            discountPct: { type: 'number', example: 10 },
+                            isHidden: { type: 'boolean', example: false },
+                            _createdBy: { type: 'string', example: 'user12345' },
+                        },
+                    
+                    
                 },
                 User: {
                     type: 'object',
@@ -57,19 +63,52 @@ export function setupSwagger(app: Application) {
                 },
                 Event: {
                     type: 'object',
-                    properties: {
-                        title: { type: 'string' },
-                        date: { type: 'string' },
-                        eventlocation: { type: 'string' },
-                        description: { type: 'string' },
-                        maxAttendees: { type: 'number' },
-                        attendees: { type: 'array', items: { type: 'string' } }, // Rettet manglende "items" i array
-                        imageURL: { type: 'string' },
-                        createdBy: { type: 'string' },
+        properties: {
+            id: {
+                type: 'string',
+                description: 'Unique identifier for the event',
+            },
+            title: {
+                type: 'string',
+                description: 'Title of the event',
+            },
+            description: {
+                type: 'string',
+                description: 'Detailed description of the event',
+            },
+            date: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Date and time of the event',
+            },
+            eventlocation: {
+                type: 'string',
+                description: 'Location of the event',
+            },
+            maxAttendees: {
+                type: 'number',
+                description: 'Maximum number of attendees',
+            },
+            attendees: {
+                type: 'array',
+                description: 'List of attendees',
+                items: {
+                    type: 'string',
+                },
+            },
+            imageURL: {
+                type: 'string',
+                description: 'URL of the event image',
+            },
+            createdBy: {
+                type: 'string',
+                description: 'User ID of the event creator',
+            },
+        },
                     },
                 },
-            }, // Lukkede "schemas" objektet korrekt
-        }, // Lukkede "components" objektet korrekt
+            }, 
+         
     }; 
 
     // Options for the swagger docs
