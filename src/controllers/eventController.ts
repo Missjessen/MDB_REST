@@ -95,65 +95,27 @@ export async function getEventById(req: Request, res: Response) {
 }
 
 
-// /* /**
-//  * Update a event in the database
-//  * @param {Request} req - The request object
-//  * @param {Response} res - The response object
-//  */
-
-// export async function updateEvent(req: Request, res: Response) {
-//     try {
-//         await connect();
-//         const result = await eventModel.findByIdAndUpdate(req.params.id, req.body);
-//         res.status(200).send(result);
-//     }
-//     catch (error){
-//         res.status(500).send("Error updating event . error: " + error);
-//     }
-//     finally {
-//         await disconnect();
-//     }
-// } */
-
 /**
- * Update a specific event in the database
+ * Update a event in the database
  * @param {Request} req - The request object
  * @param {Response} res - The response object
  */
-export async function updateEvent(req: Request, res: Response): Promise<void>   {
+
+export async function updateEvent(req: Request, res: Response) {
     try {
         await connect();
-
-        // Find eksisterende event
-        const existingEvent = await eventModel.findById(req.params.id);
-
-
-        if (!existingEvent) {
-            res.status(404).send({ message: "Event not found" });
-            return;
-        }
-
-
-
-        // Opdater event med de nye data
-        const updatedEvent = await eventModel.findByIdAndUpdate(
-            req.params.id,
-            { $set: req.body },   // $set sikrer kun de felter, der ændres
-            { new: true, runValidators: true } // Returnér den opdaterede version og valider data
-        );
-
-        res.status(200).send({
-            message: "Event updated successfully",
-            updatedEvent
-        });
-    } 
-    catch (error) {
-        res.status(500).send("Error Event not updated by id . error: " + error);
-    } 
+        const result = await eventModel.findByIdAndUpdate(req.params.id, req.body);
+        res.status(200).send(result);
+    }
+    catch (error){
+        res.status(500).send("Error updating event . error: " + error);
+    }
     finally {
         await disconnect();
     }
 }
+
+
 
 /**
  * Delete a event in the database

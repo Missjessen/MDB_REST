@@ -42,12 +42,12 @@ export function setupSwagger(app: Application) {
                   properties: {
                             name: { type: 'string', example: 'Smartphone X' },
                             description: { type: 'string', example: 'High-end smartphone with 256GB storage' },
-                            imageURL: { type: 'string', example: 'https://example.com/image.jpg' },
                             price: { type: 'number', example: 999.99 },
                             stock: { type: 'number', example: 50 },
                             isONdiscount: { type: 'boolean', example: true },
                             discountPct: { type: 'number', example: 10 },
                             isHidden: { type: 'boolean', example: false },
+                            imageURL: { type: 'string', example: 'https://example.com/image.jpg' },
                             _createdBy: { type: 'string', example: 'user12345' },
                         },
                     
@@ -63,49 +63,50 @@ export function setupSwagger(app: Application) {
                 },
                 Event: {
                     type: 'object',
-        properties: {
-            id: {
-                type: 'string',
-                description: 'Unique identifier for the event',
-            },
-            title: {
-                type: 'string',
-                description: 'Title of the event',
-            },
-            description: {
-                type: 'string',
-                description: 'Detailed description of the event',
-            },
-            date: {
-                type: 'string',
-                format: 'date-time',
-                description: 'Date and time of the event',
-            },
-            eventlocation: {
-                type: 'string',
-                description: 'Location of the event',
-            },
-            maxAttendees: {
-                type: 'number',
-                description: 'Maximum number of attendees',
-            },
-            attendees: {
-                type: 'array',
-                description: 'List of attendees',
-                items: {
-                    type: 'string',
-                },
-            },
-            imageURL: {
-                type: 'string',
-                description: 'URL of the event image',
-            },
-            createdBy: {
-                type: 'string',
-                description: 'User ID of the event creator',
-            },
-        },
+                    properties: {  
+                        id: {
+                            type: 'string',
+                            description: 'Unique identifier for the event',
+                        },
+                        title: {
+                            type: 'string',
+                            description: 'Title of the event',
+                        },
+                        description: {
+                            type: 'string',
+                            description: 'Detailed description of the event',
+                        },
+                        date: {
+                            type: 'string',
+                            format: 'date-time',
+                            description: 'Date and time of the event',
+                        },
+                        eventlocation: {
+                            type: 'string',
+                            description: 'Location of the event',
+                        },
+                        maxAttendees: {
+                            type: 'number',
+                            description: 'Maximum number of attendees',
+                        },
+                        attendees: {
+                            type: 'array',
+                            description: 'List of attendees',
+                            items: {
+                                type: 'string',
+                            },
+                        },
+                        imageURL: {
+                            type: 'string',
+                            description: 'URL of the event image',
+                        },
+                        createdBy: {
+                            type: 'string',
+                            description: 'User ID of the event creator',
+                        },
                     },
+                },
+                
                 },
             }, 
          

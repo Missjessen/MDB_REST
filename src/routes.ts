@@ -26,7 +26,7 @@ const router: Router = Router();
  * /:
  *   get:
  *     tags: 
- *       - app routes
+ *       - app routes   
  *     summary: Welcome to the MENTS API
  *     description: Returns a welcome message for the MENTS API.
  *     responses:
@@ -282,7 +282,7 @@ router.post('/events', verifyToken, createEvent);
  *               items:
  *                 $ref: "#/components/schemas/Event" 
  *         500: 
-             description: Internal server error
+ *          description: Internal server error
  *      
  *        
  */
