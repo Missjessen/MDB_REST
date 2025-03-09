@@ -26,6 +26,7 @@ app.use(cors({
 
 
 // **Middleware**
+corsSetup(); 
 app.use(express.json());
 
 
@@ -33,7 +34,7 @@ app.use(express.json());
 export function startServer() {
     testConnection();
 
-    corsSetup(); 
+  
 
     //  Håndter preflight requests
 app.options("*", cors()); // **Gør, at serveren besvarer preflight requests korrekt**
