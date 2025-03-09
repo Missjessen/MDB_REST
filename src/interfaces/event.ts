@@ -3,7 +3,7 @@ import { User } from "./user";
 export interface Event extends Document {
     
     title: string;
-    date: string;
+    eventDate: string;
     eventlocation: string;
     description: string;
     maxAttendees: number;

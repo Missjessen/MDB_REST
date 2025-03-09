@@ -2,6 +2,7 @@ import express, { Request, Response, Router } from 'express';
 import { v2 as cloudinary } from 'cloudinary';
 import { eventModel } from './models/eventModel'; // Opdateret import for eventSchema
 import * as streamifier from 'streamifier';
+import { string } from 'joi/lib';
 
 const router: Router = express.Router();
 
@@ -37,12 +38,12 @@ router.post('/upload', async (req: Request, res: Response) => {
                 }
 
                 try {
-                    const { title, date, eventlocation, description, maxAttendees, createdBy } = req.body;
+                    const { title, eventDate, eventlocation, description, maxAttendees, createdBy } = req.body;
 
                     // Opret nyt event med data fra request body
                     const newEvent = await eventModel.create({
                         title: title || "Ukendt Event",
-                        date: date || new Date(),
+                        eventDate: string || new Date(),
                         eventlocation: eventlocation || "Ukendt Sted",
                         description: description || "Ingen beskrivelse angivet",
                         maxAttendees: maxAttendees || 100,

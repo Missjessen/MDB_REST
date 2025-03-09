@@ -360,7 +360,7 @@ router.get('/events/:id', getEventById);
  *               updatedEvent:
  *                 title: "Sample Event Title"
  *                 description: "Updated description"
- *                 date: "2025-03-07T10:40:36.851Z"
+ *                 eventDate: "2025-03-07T10:40:36.851Z"
  *                 eventlocation: "Updated Location"
  *                 maxAttendees: 200
  *                 attendees: ["Alice", "Bob"]
