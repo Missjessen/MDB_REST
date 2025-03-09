@@ -3,7 +3,7 @@ import { Event } from "../interfaces/event";
 
 const eventSchema = new Schema<Event>({
     title: { type: String, required: true, min: 6, max: 255 },
-    eventDate: { type: String, required: true },
+    date: { type: Date, required: true },
     eventlocation: { type: String, required: true, min: 6, max: 255 },
     description: { type: String, required: false, min: 6, max: 1024 },
     maxAttendees: { type: Number, required: true },
