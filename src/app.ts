@@ -25,8 +25,10 @@ app.use(cors({
 
 
 // **Middleware**
-corsSetup(); 
-app.use(express.json());
+corsSetup();  
+app.use(express.json()); // Aktiver JSON parsing i Express
+app.use(express.urlencoded({ extended: true }));
+
 
 
 // Start server funktion
@@ -48,7 +50,7 @@ app.use(express.json()); // Aktiver JSON parsing i Express
 app.use("/api", router);
 
   // **Inkluder uploadRoute**
-  app.use("/api/upload", uploadRoute); // ✅ Placer upload-ruten her
+  app.use("/api/upload", uploadRoute);
 
 setupSwagger(app);
 
