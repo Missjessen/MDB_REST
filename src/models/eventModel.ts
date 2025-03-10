@@ -12,6 +12,7 @@ const eventSchema = new Schema<Event>({
     createdBy: { type: String, ref: 'User', required: true }
 });
 
+
 type UpdateQuery<T> = {
     [key: string]: unknown;
 } & {

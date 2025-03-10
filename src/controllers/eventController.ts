@@ -2,42 +2,41 @@ import { Request, Response } from 'express';
 import { eventModel } from '../models/eventModel';
 import { connect, disconnect } from '../repository/database';
 
-//CRUD -create, read, update, delete
+// ░▒▓██ get, post, put, delete (CRUD)██▓▒░
 
-
+// ======================== CREATE EVENT ========================
 /**
  * Create a new event in the database
  * @param {Request} req - The request object
  * @param {Response} res - The response object
  */
-
-/* export async function createEvent(req: Request, res: Response): Promise<void> {
-
-    const data = req.body;
-    try {
-        await connect();
-        const event = new eventModel(data);
-        const result = await event.save();
-
-        res.status(201).send(result);
-    }
-    catch (error){
-        res.status(500).send("Error creating . error: " + error);
-    }
-    finally {
-        await disconnect();
-    }
-} */
-
 export async function createEvent(req: Request, res: Response): Promise<void> {
     const eventData = req.body; // Ændret fra "event" til "eventData"
     try {
+/*
+        const testData = {
+            
+                "title": "Vue.js Meetup",
+                "date": "2025-03-15T18:00:00.000Z",
+                "eventlocation": "Copenhagen, Denmark",
+                "description": "Lær om Vue.js og mød andre udviklere!",
+                "maxAttendees": 50,
+                "attendees": [],
+                "createdBy": "user123"
+              
+        }
+*/
+
+        console.log(eventData);
         await connect();
         const newEvent = new eventModel(eventData); // Brug "newEvent" i stedet
+        
         const result = await newEvent.save();
+
         res.status(201).send(result);
     }
     catch (error) {
+        //console.log(error)
         res.status(500).send("Error creating event. Error: " + error);
     }
     finally {
@@ -45,12 +44,12 @@ export async function createEvent(req: Request, res: Response): Promise<void> {
     }
 }
 
+// ======================== GET ALL EVENTS ========================
 /**
- * retrieves all events from the database
+ * Retrieves all events from the database
  * @param {Request} req - The request object
  * @param {Response} res - The response object
  */
-
 export async function getAllEvents(req: Request, res: Response) {
 
     
@@ -71,12 +70,12 @@ export async function getAllEvents(req: Request, res: Response) {
 
 
 
+// ======================== GET EVENT BY ID ========================
 /**
- * retrieves a event by id from the database
+ * Retrieves an event by ID from the database
  * @param {Request} req - The request object
  * @param {Response} res - The response object
  */
-
 export async function getEventById(req: Request, res: Response) {
 
     
@@ -95,12 +94,12 @@ export async function getEventById(req: Request, res: Response) {
 }
 
 
+// ======================== UPDATE EVENT ========================
 /**
- * Update a event in the database
+ * Update an event in the database
  * @param {Request} req - The request object
  * @param {Response} res - The response object
  */
-
 export async function updateEvent(req: Request, res: Response) {
     try {
         await connect();
@@ -116,15 +115,12 @@ export async function updateEvent(req: Request, res: Response) {
 }
 
 
-
+// ======================== DELETE EVENT ========================
 /**
- * Delete a event in the database
+ * Delete an event in the database
  * @param {Request} req - The request object
  * @param {Response} res - The response object
  */
-
-
-
 export async function deleteEventById(req: Request, res: Response) {
 
     const id = req.params.id;

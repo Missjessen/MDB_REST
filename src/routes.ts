@@ -21,26 +21,8 @@ const router: Router = Router();
 █          🌐 API ROUTES CONFIGURATION          █                                            
 █████████████████████████████████████████████████
 */
-/**
- * @swagger
- * /:
- *   get:
- *     tags: 
- *       - app routes   
- *     summary: Welcome to the MENTS API
- *     description: Returns a welcome message for the MENTS API.
- *     responses:
- *       200:
- *         description: A welcome message
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Welcome to the MENTS API
- */
+
+
 router.get('/', (req: Request, res: Response) => {
     res.status(200).send('Welcome to the THIS API');
 });
@@ -54,8 +36,6 @@ router.get('/', (req: Request, res: Response) => {
  * @swagger
  * /user/register:
  *   post:
- *     tags:
- *       - User Routes
  *     summary: Register a new user
  *     description: Takes a user in the body and tries to register it in the database
  *     requestBody:
@@ -79,13 +59,10 @@ router.get('/', (req: Request, res: Response) => {
  */
 router.post('/user/register', registerUser );
 
-
 /**
  * @swagger
  * /user/login:
  *   post:
- *     tags:
- *       - User Routes
  *     summary: Login an existing user
  *     description: Logs in an existing user
  *     requestBody:
@@ -97,22 +74,34 @@ router.post('/user/register', registerUser );
  *             properties:
  *               email:
  *                 type: string
+ *                 example: "homer@springfield.com"
  *               password:
  *                 type: string
+ *                 example: "DonutLover123"
  *     responses:
  *       200:
- *         description: User logged in succesfully
+ *         description: User logged in successfully
  *         content:
  *           application/json:
  *             schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *       400:
+ *         description: Invalid email or password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid email or password"
  */
 router.post('/user/login', loginUser );
+
 
 
 /*
@@ -137,8 +126,6 @@ router.post('/user/login', loginUser );
  * @swagger
  * /products:
  *   post:
- *     tags:
- *       - Product Routes
  *     summary: Create a new Product
  *     description: Create a new Product
  *     security:
@@ -174,8 +161,6 @@ router.post('/products', createProduct);
  * @swagger
  * /products:
  *   get:
- *     tags:
- *       - Product Routes
  *     summary: Retrieves a list of Products
  *     description: Retrieves a list of products as JSON objects.
  *     responses:
@@ -198,8 +183,6 @@ router.get('/products/:id', getProductById);
  * @swagger
  * /products/query/{field}/{value}:
  *   get:
- *     tags:
- *       - Product Routes
  *     summary: Retrieves all Products based on a specified query
  *     description:
  *     parameters:
@@ -232,8 +215,6 @@ router.get('/products/query/:key/:value', getProductsByQuery);
  * @swagger
  * /products/{id}:
  *   put:
- *     tags:
- *       - Product Routes
  *     summary: Updates a specific Product
  *     description: Updates a specific Product based on it id
  *     security:
@@ -267,8 +248,6 @@ router.put('/products/:id', verifyToken, updateProductsById);
  * @swagger
  * /products/{id}:
  *   delete:
- *     tags:
- *       - Product Routes
  *     summary: Deletes a specific Product
  *     description: Deletes a specific Product based on it id
  *     security:
@@ -314,8 +293,6 @@ router.delete('/products/:id', verifyToken, deleteProductsById);
  * @swagger
  * /events:
  *   post:
- *     tags:
- *       - Event Routes
  *     summary: Create a new Event
  *     description: Creates a new event and stores it in the database.
  *     security:
@@ -326,6 +303,15 @@ router.delete('/products/:id', verifyToken, deleteProductsById);
  *         application/json:
  *           schema:
  *             $ref: "#/components/schemas/Event"
+ *           example:
+ *             title: "Mr. Burns statue unveiling"
+ *             date: "2025-10-10T12:00:00"
+ *             eventlocation: "Springfield Town Hall"
+ *             description: "Unveiling of the finest statue of Mr. Burns"
+ *             maxAttendees: 200
+ *             attendees: []
+ *             imageURL: "https://picsum.photos/500/500"
+ *             createdBy: "6748771972ba527f3a17a313"
  *     responses:
  *       201:
  *         description: Event created successfully
@@ -338,7 +324,7 @@ router.delete('/products/:id', verifyToken, deleteProductsById);
  *       401:
  *         description: Unauthorized - Missing or invalid token
  */
-router.post('/events', verifyToken, createEvent);
+router.post('/events', createEvent);
 
 
 // ========= 2. GetAllEvents =========
@@ -346,8 +332,6 @@ router.post('/events', verifyToken, createEvent);
  * @swagger
  * /events:
  *   get:
- *     tags:
- *       - Event Routes
  *     summary: Get all Events
  *     description: Retrieves a list of all events.
  *     responses:
@@ -371,28 +355,41 @@ router.get('/events', getAllEvents);
  * @swagger
  * /events/{id}:
  *   get:
- *     tags:
- *       - Event Routes
- *     summary: Get a specific Event
- *     description: Retrieves details of a specific event based on its ID.
+ *     summary: Retrieve an Event by ID
+ *     description: Retrieves detailed information about a specific event using its unique identifier.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: Unique ID of the event
+ *         description: The unique identifier (ObjectId) of the event to retrieve.
  *         schema:
  *           type: string
+ *           example: "67c399a06023098382da63b5"
  *     responses:
  *       200:
- *         description: Event retrieved successfully
+ *         description: Event retrieved successfully.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: "#/components/schemas/Event"
+ *             example:
+ *               _id: "67c399a06023098382da63b5"
+ *               title: "Homers Chili Challenge"
+ *               date: "2025-09-20T13:00:00.000Z"
+ *               eventlocation: "Springfield Bytorv"
+ *               description: "Kan du klare Homers super-hot chili? Test dine smagsløg!"
+ *               maxAttendees: 75
+ *               attendees:
+ *                 - "user123"
+ *                 - "user456"
+ *               imageURL: "https://picsum.photos/500/500"
+ *               createdBy: "user222"
+ *       400:
+ *         description: Bad Request - Invalid ID format.
  *       404:
- *         description: Event not found
- *      500:
- *        description: Internal server error
+ *         description: Event not found with the specified ID.
+ *       500:
+ *         description: Internal Server Error - Something went wrong on the server.
  */
 router.get('/events/:id', getEventById);
 
@@ -402,54 +399,47 @@ router.get('/events/:id', getEventById);
  * @swagger
  * /events/{id}:
  *   put:
- *     tags:
- *       - Event Routes
- *     summary: Update a specific Event
- *     description: Updates the details of a specific event based on its ID.
+ *     summary: Update an Event by ID
+ *     description: Updates the details of a specific event identified by its ID.
  *     security:
  *       - ApiKeyAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: Unique ID of the event
+ *         description: Unique ID of the event to update.
  *         schema:
  *           type: string
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/Event"
  *           example:
- *             title: "Sample Event Title"
- *             description: "This is a sample event description"
- *             date: "2025-03-07T10:40:36.851Z"
- *             eventlocation: "Sample Location"
+ *             title: "Homers Chili Challenge"
+ *             date: "2025-09-20T13:00:00"
+ *             eventlocation: "Springfield Bytorv"
+ *             description: "Kan du klare Homers super-hot chili? Test dine smagsløg!"
  *             maxAttendees: 100
- *             attendees: ["John Doe", "Jane Doe"]
- *             imageURL: "https://example.com/sample-image.jpg"
- *             createdBy: "admin"
+ *             attendees: ["user123", "user456"]
+ *             imageURL: "https://example.com/image.jpg"
+ *             createdBy: "6748771972ba527f3a17a313"
  *     responses:
  *       200:
- *         description: Event updated successfully
+ *         description: Event updated successfully.
  *         content:
  *           application/json:
- *             example:
- *               message: "Event updated successfully"
- *               updatedEvent:
- *                 title: "Sample Event Title"
- *                 description: "Updated description"
- *                 eventDate: "2025-03-07T10:40:36.851Z"
- *                 eventlocation: "Updated Location"
- *                 maxAttendees: 200
- *                 attendees: ["Alice", "Bob"]
- *                 imageURL: "https://example.com/updated-image.jpg"
- *                 createdBy: "admin"
- *       404:
- *         description: Event not found
+ *             schema:
+ *               $ref: "#/components/schemas/Event"
  *       400:
- *         description: Invalid request body
+ *         description: Invalid request body.
+ *       401:
+ *         description: Unauthorized - Token is invalid or missing.
+ *       404:
+ *         description: Event not found.
  *       500:
- *         description: Server error
+ *         description: Internal Server Error - Something went wrong on the server.
  */
 router.put('/events/:id', verifyToken, updateEvent);
 
@@ -459,8 +449,6 @@ router.put('/events/:id', verifyToken, updateEvent);
  * @swagger
  * /events/{id}:
  *   delete:
- *     tags:
- *       - Event Routes
  *     summary: Delete a specific Event
  *     description: Deletes a specific event from the database based on its ID.
  *     security:
@@ -480,7 +468,7 @@ router.put('/events/:id', verifyToken, updateEvent);
  *       404:
  *         description: Event not found
  */
-router.delete('/events/:id', verifyToken, deleteEventById);
+router.delete('/events/:id', deleteEventById);
 
 
 

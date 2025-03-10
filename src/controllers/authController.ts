@@ -12,9 +12,10 @@ import { userModel } from "../models/userModel";
 import { User } from "../interfaces/user";
 import { connect, disconnect } from "../repository/database";
 
+// ======================== REGISTER USER ========================
 /**
  * Register a new user
-* @param {Request} req - The request object
+ * @param {Request} req - The request object
  * @param {Response} res - The response object
  * @returns
  */
@@ -64,6 +65,7 @@ export async function registerUser(req: Request, res: Response) {
     }
 };
 
+// ======================== LOGIN USER ========================
 /**
  * Login a user
  * @param {Request} req - The request object
@@ -134,12 +136,34 @@ export function validateUserRegistrationInfo(data: User): ValidationResult {
     return schema.validate(data);
 }
 
+
+
+// ======================== VALIDATION FUNCTIONS ========================
 /**
- * middleware to verify the token
+ * Validate user registration info
+ * @param data - User data object
+ */
+export function validateUserLoginInfo(data: User): ValidationResult {
+
+    // define the schema
+    const schema = Joi.object({
+        
+        email: Joi.string().email().min(6).max(255).required(),
+        password: Joi.string().min(6).max(30).required()
+    });
+
+    return schema.validate(data);
+}
+
+
+
+// ======================== TOKEN VERIFICATION ========================
+/**
+ * Middleware to verify the token
  * @param {Request} req - The request object
  * @param {Response} res - The response object
  * @param {NextFunction} next - The next function
-*/
+ */
 
 export function verifyToken(req: Request, res: Response, next: NextFunction) {
     const token = req.header("auth-token");
@@ -154,32 +178,9 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
         if (token) 
             jwt.verify(token, process.env.TOKEN_SECRET as string);
             next();
-
-        }
-
-    
-    catch {
+           }
+        catch {
         res.status(400).send("Invalid Token");
     }
-}
-
-
-    
-
-/**
- * Validate user registration info
- * @param data
- */
-export function validateUserLoginInfo(data: User): ValidationResult {
-
-    // define the schema
-    const schema = Joi.object({
-        
-        email: Joi.string().email().min(6).max(255).required(),
-        password: Joi.string().min(6).max(30).required()
-    });
-
-
-    return schema.validate(data);
 }
 
