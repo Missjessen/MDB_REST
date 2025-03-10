@@ -20,7 +20,7 @@ export function setupSwagger(app: Application) {
                 description: 'Development server',
             },
             {
-                url: 'https://mdb-rest.onrender.com/api/',
+                url: 'https://mdb-rest.onrender.com/api/docs',
                 description: 'Remote render.com server',
             },
         ],

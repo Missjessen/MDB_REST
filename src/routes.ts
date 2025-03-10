@@ -44,6 +44,10 @@ router.get('/', (req: Request, res: Response) => {
  *         application/json:
  *           schema:
  *             $ref: "#/components/schemas/User"
+ *           example:
+ *             name: "homer_simpson"
+ *             email: "homer.simpson@springfield.com"
+ *             password: "donuts4life"
  *     responses:
  *       201:
  *         description: User created successfully
@@ -58,6 +62,7 @@ router.get('/', (req: Request, res: Response) => {
  *                   type: string
  */
 router.post('/user/register', registerUser );
+
 
 /**
  * @swagger
