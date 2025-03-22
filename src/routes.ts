@@ -11,6 +11,8 @@ import { loginUser, registerUser, verifyToken } from './controllers/authControll
 
 import { createEvent,deleteEventById,getAllEvents,getEventById,updateEvent } from './controllers/eventController'; 
 
+
+
 const router: Router = Router();
 
 
@@ -24,7 +26,7 @@ const router: Router = Router();
 
 
 router.get('/', (req: Request, res: Response) => {
-    res.status(200).send('Welcome to the THIS API');
+    res.status(200).send({message:'Welcome to the THIS API'});
 });
 
 /* 
@@ -329,7 +331,7 @@ router.delete('/products/:id', verifyToken, deleteProductsById);
  *       401:
  *         description: Unauthorized - Missing or invalid token
  */
-router.post('/events', createEvent);
+router.post('/events', verifyToken, createEvent);
 
 
 // ========= 2. GetAllEvents =========
@@ -473,7 +475,8 @@ router.put('/events/:id', verifyToken, updateEvent);
  *       404:
  *         description: Event not found
  */
-router.delete('/events/:id', deleteEventById);
+router.delete('/events/:id', verifyToken, deleteEventById);
+
 
 
 

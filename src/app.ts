@@ -5,6 +5,12 @@ import cors from "cors";
 import { testConnection } from "./repository/database";
 import router from "./routes";
 import { setupSwagger } from "./util/documentationSwag";
+import googleAuthRoutes from './authRoutes';
+import { googleLogin, googleCallback } from './controllers/googleAuthController';
+
+
+
+
 
 dotenvFlow.config();
 
@@ -25,7 +31,8 @@ app.use(cors({
 // ======================== MIDDLEWARE SETUP ========================
 app.use(express.json());         
 app.use(express.urlencoded({ extended: true })); 
-
+app.get('/auth/google', googleLogin);
+app.get('/auth/google/callback', googleCallback);  // Brug `app.get()` her
 // ======================== SERVER START ========================
 export function startServer() {
     testConnection();
@@ -36,6 +43,7 @@ export function startServer() {
     // Route setup
     app.use("/api", router);
     app.use("/api/upload", uploadRoute); 
+    app.use('/api/auth', googleAuthRoutes)
 
     // Swagger documentation
     setupSwagger(app);

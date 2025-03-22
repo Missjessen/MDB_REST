@@ -23,7 +23,7 @@ export async function connect() {
 
         if (mongoose.connection.db) {
             await mongoose.connection.db.admin().command({ ping: 1 });
-            console.log("Connected to database");
+            //console.log("Connected to database");
         } 
         else {
             throw new Error("Error connecting to database");
@@ -39,7 +39,7 @@ console.log("Error connecting to database. Error: " + error);
 export async function disconnect() {
     try {
         await mongoose.disconnect();
-        console.log("Disconnected from database");
+        //console.log("Disconnected from database");
     } catch (error) {
         console.log("Error disconnecting from database. Error: " + error);
     }
