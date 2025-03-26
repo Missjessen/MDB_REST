@@ -6,7 +6,7 @@ import { testConnection } from "./repository/database";
 import router from "./routes";
 import { setupSwagger } from "./util/documentationSwag";
 import googleAuthRoutes from './authRoutes';
-import { googleLogin, googleCallback } from './controllers/googleAuthController';
+import authRoutes from './authRoutes';
 
 
 
@@ -31,8 +31,10 @@ app.use(cors({
 // ======================== MIDDLEWARE SETUP ========================
 app.use(express.json());         
 app.use(express.urlencoded({ extended: true })); 
-app.get('/auth/google', googleLogin);
-app.get('/auth/google/callback', googleCallback);  // Brug `app.get()` her
+// Routes
+app.use('/auth', authRoutes);
+// app.get('/auth/google', googleLogin);
+// app.get('/auth/google/callback', googleCallback);  // Brug `app.get()` her
 // ======================== SERVER START ========================
 export function startServer() {
     testConnection();
