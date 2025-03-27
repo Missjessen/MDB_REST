@@ -10,6 +10,8 @@ import authRoutes from './authRoutes';
 
 
 
+import dotenv from 'dotenv';
+dotenv.config();
 
 
 dotenvFlow.config();

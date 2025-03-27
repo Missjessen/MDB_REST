@@ -2,12 +2,15 @@ import mongoose, { Schema } from 'mongoose'
 import { IUser } from '../interfaces/IUser'
 
 const iUserSchema = new Schema<IUser>({
-    email: { type: String, required: true, unique: true },
-    googleAdsId: { type: String, required: true },
-    accessToken: { type: String, required: true },
-    refreshToken: { type: String, required: true },
-    expiryDate: { type: Date, required: true }
-})
+  email:        { type: String, required: true, unique: true },
+  googleId:     { type: String, required: true, unique: true },
+  accessToken:  { type: String, required: true },
+  refreshToken: { type: String, required: true },
+  expiryDate:   { type: Date,   required: true },
+
+  googleAdsCustomerId: { type: String },  // valgfri
+  sheetId:             { type: String }   // valgfri
+});
 
 export const iUserModel = mongoose.model<IUser>('iUser', iUserSchema)
 

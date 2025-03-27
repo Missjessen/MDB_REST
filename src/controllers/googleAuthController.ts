@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-// import { generateAuthUrl, getGoogleTokens, getUserInfo } from '../services/googleAuthService';
+//import { generateAuthUrl, getGoogleTokens, getUserInfo } from '../services/googleAuthService';
 import { iUserModel } from '../models/iUserModel';
 import { OAuth2Client } from 'google-auth-library';
+import { google } from 'googleapis';
 
 
 const client = new OAuth2Client(
@@ -22,11 +23,12 @@ export async function googleLogin(req: Request, res: Response) {
 
     console.log("✅ OAuth URL:", url);
     res.redirect(url);
-}
+} 
 /* export async function googleLogin(req: Request, res: Response) {
     const url = client.generateAuthUrl({
-        access_type: 'offline',    // 🔥 Sikrer refresh_token
-        prompt: 'consent',         // 🔥 Tvinger brugeren til at bekræfte hver gang
+    // Sikrer refresh_token
+        access_type: 'offline',    
+        prompt: 'consent',         
         scope: [
             'https://www.googleapis.com/auth/adwords',
             'https://www.googleapis.com/auth/spreadsheets',
@@ -42,36 +44,64 @@ export async function googleLogin(req: Request, res: Response) {
 
 export async function googleCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { code } = req.query;
-
+  
     if (!code) {
-        console.error('❌ Ingen kode modtaget fra Google');
-        res.status(400).json({ error: 'Fejl: Ingen kode modtaget.' });
-        return;
+      res.status(400).json({ error: 'Manglende autorisationskode.' });
+      return;
     }
-
+  
     try {
-        const { tokens } = await client.getToken(code as string);
-
-        if (!tokens || !tokens.access_token) {
-            console.error('❌ Token-udveksling mislykkedes');
-            res.status(500).json({ error: 'Token-udveksling mislykkedes' });
-            return;
+      const tokenResponse = await client.getToken(code as string);
+      const tokens = tokenResponse.tokens;
+  
+      client.setCredentials(tokens);
+  
+      const oauth2 = google.oauth2({ version: 'v2', auth: client });
+      const { data } = await oauth2.userinfo.get();
+  
+      // 📌 Her bruger vi userinfo fra Google:
+      const { email, id: googleId } = data;
+  
+      if (!email || !googleId) {
+        res.status(400).json({ error: 'Mangler e-mail eller Google ID.' });
+        return;
+      }
+  
+      // 📌 Find bruger med googleId (eller email hvis du foretrækker det)
+      let user = await iUserModel.findOne({ googleId });
+  
+      if (!user) {
+        // 🆕 Opret ny bruger
+        user = new iUserModel({
+          email,
+          googleId,
+          accessToken: tokens.access_token ?? '',
+          refreshToken: tokens.refresh_token ?? '',
+          expiryDate: tokens.expiry_date ? new Date(tokens.expiry_date) : new Date()
+        });
+      } else {
+        // 🔁 Opdater tokens hvis nødvendigt
+        if (tokens.access_token) user.accessToken = tokens.access_token;
+        if (tokens.refresh_token) user.refreshToken = tokens.refresh_token;
+        if (tokens.expiry_date) user.expiryDate = new Date(tokens.expiry_date);
+      }
+  
+      await user.save();
+  
+      res.status(200).json({
+        message: 'Login succesfuldt 🎉',
+        user: {
+          email: user.email,
+          googleId: user.googleId
         }
-
-        const userData = {
-            accessToken: tokens.access_token,
-            refreshToken: tokens.refresh_token,
-            expiryDate: tokens.expiry_date
-        };
-
-        console.log('✅ Tokens modtaget:', userData);
-        res.status(200).json({ message: 'Login succesfuldt', userData });
-
+      });
+  
     } catch (error) {
-        console.error("❌ Fejl ved token-udveksling:", error);
-        next(error);  // Videresend fejlen til din error-handler
+      console.error('❌ Fejl under callback:', error);
+      res.status(500).json({ error: 'Token exchange fejlede.' });
     }
-}
+  }
+  
 
 async function saveTokensToDatabase(userId: string, tokens: any) {
     await iUserModel.findOneAndUpdate(

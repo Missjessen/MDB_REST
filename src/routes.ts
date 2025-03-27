@@ -6,6 +6,7 @@ import { createProduct,
          deleteProductsById, 
          getProductsByQuery,
        } from './controllers/productController';
+import { startCron } from './controllers/devToolsController';
 
 import { loginUser, registerUser, verifyToken } from './controllers/authController';
 
@@ -14,6 +15,30 @@ import { createEvent,deleteEventById,getAllEvents,getEventById,updateEvent } fro
 
 
 const router: Router = Router();
+
+/* 
+█████████████████████████████████████████████████                                           
+█          🌐 Render alive                      █                                            
+█████████████████████████████████████████████████
+*/
+//router.get('/ping', startCron);
+/**
+ * @swagger
+ * /start-cron:
+ *   get:
+ *     tags:
+ *       - Start Cron Jobs
+ *     summary: Starts the cron job that keep render alive
+ *     description: Starts the cron job that keep render alive
+ *     responses:
+ *       200:
+ *         description: Response from the cron job
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array               
+ */
+router.get('/start-cron', startCron);
 
 
 // ░▒▓██ get, post, put, delete (CRUD)██▓▒░
