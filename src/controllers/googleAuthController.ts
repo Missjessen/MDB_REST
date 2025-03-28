@@ -1,18 +1,33 @@
 import { Request, Response, NextFunction } from 'express';
 //import { generateAuthUrl, getGoogleTokens, getUserInfo } from '../services/googleAuthService';
 import { iUserModel } from '../models/iUserModel';
-import { OAuth2Client } from 'google-auth-library';
 import { google } from 'googleapis';
 
 
-const client = new OAuth2Client(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
-);
+export async function googleLogin(req: Request, res: Response) {
+    const client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID!,
+      process.env.GOOGLE_CLIENT_SECRET!,
+      process.env.GOOGLE_REDIRECT_URI!
+    );
+  
+    const url = client.generateAuthUrl({
+      access_type: 'offline',
+      prompt: 'consent',
+      scope: [
+        'https://www.googleapis.com/auth/adwords',
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/userinfo.email',
+        'https://www.googleapis.com/auth/userinfo.profile'
+      ]
+    });
+  
+    res.redirect(url);
+  }
+  
 
 // ➤ 1. Login Endpoint - Omdiriger til Googles OAuth 2.0-side
-export async function googleLogin(req: Request, res: Response) {
+/* export async function googleLogin(req: Request, res: Response) {
     const url = `https://accounts.google.com/o/oauth2/auth?` +
         `client_id=${process.env.GOOGLE_CLIENT_ID}` +
         `&redirect_uri=${encodeURIComponent(process.env.GOOGLE_REDIRECT_URI as string)}` +
@@ -23,7 +38,7 @@ export async function googleLogin(req: Request, res: Response) {
 
     console.log("✅ OAuth URL:", url);
     res.redirect(url);
-} 
+}  */
 /* export async function googleLogin(req: Request, res: Response) {
     const url = client.generateAuthUrl({
     // Sikrer refresh_token
@@ -41,8 +56,42 @@ export async function googleLogin(req: Request, res: Response) {
     res.redirect(url);
 } */
 // ➤ 2. Callback Endpoint - Håndterer token-exchange
+export async function googleCallback(req: Request, res: Response) {
+    const { code } = req.query;
+  
+    const client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID!,
+      process.env.GOOGLE_CLIENT_SECRET!,
+      process.env.GOOGLE_REDIRECT_URI!
+    );
+  
+    if (!code) {
+      res.status(400).json({ error: 'Manglende kode fra Google' });
+      return;
+    }
+  
+    try {
+      const { tokens } = await client.getToken(code as string);
+      client.setCredentials(tokens);
+  
+      const oauth2 = google.oauth2({ version: 'v2', auth: client });
+      const { data } = await oauth2.userinfo.get();
+  
+      console.log('✅ Tokens:', tokens);
+      console.log('👤 Brugerdata:', data);
+  
+      // Opret eller opdater bruger her...
+  
+      res.status(200).json({ message: 'Login OK', tokens, user: data });
+  
+    } catch (error) {
+      console.error('❌ Fejl i callback:', error);
+      res.status(500).json({ error: 'Fejl i callback' });
+    }
+  }
+  
 
-export async function googleCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
+/* export async function googleCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { code } = req.query;
   
     if (!code) {
@@ -101,7 +150,7 @@ export async function googleCallback(req: Request, res: Response, next: NextFunc
       res.status(500).json({ error: 'Token exchange fejlede.' });
     }
   }
-  
+   */
 
 async function saveTokensToDatabase(userId: string, tokens: any) {
     await iUserModel.findOneAndUpdate(
