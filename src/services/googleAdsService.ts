@@ -1,5 +1,5 @@
-import { GoogleAdsApi } from 'google-ads-api';
-import { IUser } from '../interfaces/IUser';
+//import { GoogleAdsApi } from 'google-ads-api';
+//import { IUser } from '../interfaces/IUser';
 import { google } from 'googleapis';
 
 /* export function getAdsClient(user: IUser) {
