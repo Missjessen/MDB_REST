@@ -1,13 +1,12 @@
 
     export interface IUser extends Document {
-    email: string;                    // Brugerens Google-email
-    googleId: string;                // Unik Google-bruger-ID (fra userinfo.get())
-    accessToken: string;             // OAuth2 access_token
-    refreshToken: string;            // OAuth2 refresh_token
-    expiryDate: Date;                // Token udløbsdato
-  
-    googleAdsCustomerId?: string;    // Valgfrit: MCC / Client ID fra Google Ads
-    sheetId?: string;                // Valgfrit: Google Sheet ID, hvis du arbejder med Sheets
+    email: string;
+    googleId: string;
+    accessToken: string;
+    refreshToken: string;
+    expiryDate: Date;
+    googleAdsCustomerId?: string;
+    sheetId?: string;
   }
   
   
