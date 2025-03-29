@@ -44,3 +44,16 @@ export async function disconnect() {
         console.log("Error disconnecting from database. Error: " + error);
     }
 }
+
+export async function withDatabase<T>(operation: () => Promise<T>): Promise<T | null> {
+    try {
+        await connect();
+        const result = await operation();
+        return result;
+    } catch (error) {
+        console.error("❌ Fejl under databaseoperation:", error);
+        return null;
+    } finally {
+        await disconnect();
+    }
+}

@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose'
+import { Schema, model } from "mongoose";
 import { IUser } from '../interfaces/IUser'
 
 const iUserSchema = new Schema<IUser>({
@@ -12,7 +12,9 @@ const iUserSchema = new Schema<IUser>({
   sheetId:             { type: String }   // valgfri
 });
 
-export const iUserModel = mongoose.model<IUser>('iUser', iUserSchema)
+export const iUserModel = model<IUser>('iUser', iUserSchema);
+
+
 
 
   /* name: { type: String, required: true },

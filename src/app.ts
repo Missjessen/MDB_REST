@@ -35,8 +35,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 // Routes
 app.use('/auth', authRoutes);
-// app.get('/auth/google', googleLogin);
-// app.get('/auth/google/callback', googleCallback);  // Brug `app.get()` her
+app.use('/api', router);
+app.use('/api/auth', authRoutes);
 // ======================== SERVER START ========================
 export function startServer() {
     testConnection();
