@@ -6,7 +6,7 @@ import { testConnection } from "./repository/database";
 import router from "./routes";
 import { setupSwagger } from "./util/documentationSwag";
 import googleAuthRoutes from './authRoutes';
-import authRoutes from './authRoutes';
+x77import authRoutes from './authRoutes';
 
 
 
