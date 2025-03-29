@@ -33,5 +33,3 @@ jobs:
           DBHOST: ${{ secrets.DBHOST }}
           TOKEN: ${{ secrets.TOKEN }}
           JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
-     
-  
