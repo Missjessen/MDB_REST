@@ -1,4 +1,5 @@
-export interface IUser {
+
+    export interface IUser extends Document {
     email: string;                    // Brugerens Google-email
     googleId: string;                // Unik Google-bruger-ID (fra userinfo.get())
     accessToken: string;             // OAuth2 access_token
