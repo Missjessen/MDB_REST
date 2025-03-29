@@ -12,7 +12,7 @@ export default function health() {
         test("health check", async ({ request }) => {
             const response = await request.get("/api/");
             const json = await response.json();
-            expect(response.status()).toBe(200);
+            expect(response.status()).toBe(20);
             expect(json).toEqual({ message: 'Welcome to the THIS API' });
         }); 
     }
