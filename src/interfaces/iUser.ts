@@ -10,6 +10,7 @@
     sheetId?: string;                // Valgfrit: Google Sheet ID, hvis du arbejder med Sheets
   }
   
+  
 
 /* export interface IUser {
     email: String;
