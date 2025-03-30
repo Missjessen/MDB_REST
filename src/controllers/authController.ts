@@ -58,7 +58,7 @@ export async function registerUser(req: Request, res: Response) {
         res.status(201).json({ error: null, data: savedUser._id });
 
     } catch (error) {
-        res.status(500).send("Error registrering user. Error: " + error);
+        res.status(500).send({ error: `Error registrering user. Error`});
     }
     finally {
         await disconnect();
@@ -115,7 +115,7 @@ export async function loginUser(req: Request, res: Response) {
         }
 
     } catch (error) {
-        res.status(500).send("Error logging in user. Error: " + error);
+        res.status(500).send({ error: "Error logging in user." });
     } finally {
         await disconnect();
     }
