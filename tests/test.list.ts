@@ -21,34 +21,29 @@ async function clearDatabase() {
 }
 
 function setup() {
-    //beforeEach clear test database
+    // Ryd testdatabasen før hver test
     test.beforeEach(async () => {
         try {
             await connect();
-            await userModel.deleteMany({});
-            await productModel.deleteMany({});
-            } 
-            finally {
-                await disconnect();
-            }
-    }
-    );
-}
-test.afterAll(async () => {
-    try {
-        await connect();
-        await userModel.deleteMany({});
-        await productModel.deleteMany({});
-        } 
-        finally {
+            await clearDatabase();  // Brug clearDatabase til at rydde alle kollektioner
+        } finally {
             await disconnect();
         }
+    });
+
+    // Ryd testdatabasen efter alle tests
+    test.afterAll(async () => {
+        try {
+            await connect();
+            await clearDatabase();  // Brug clearDatabase igen for at sikre en tom database
+        } finally {
+            await disconnect();
+        }
+    });
 }
-);
 
 setup();
 
-test.describe(health);
-test.describe(userTestCollection);
-test.describe(eventTestCollection);
-
+test.describe("Health Tests", health);
+test.describe("User Tests", userTestCollection);
+test.describe("Event Tests", eventTestCollection);
