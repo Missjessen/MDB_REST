@@ -33,11 +33,11 @@ export async function createEvent(req: Request, res: Response): Promise<void> {
         
         const result = await newEvent.save();
 
-        res.status(201).send(result);
+        res.status(201).json({ result });
     }
     catch (error) {
         //console.log(error)
-        res.status(500).send("Error creating event. Error: " + error);
+        res.status(500).json({ error: "Error creating event. Error: " + error });
     }
     finally {
         await disconnect();
