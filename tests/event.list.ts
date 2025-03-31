@@ -35,11 +35,18 @@ export default function eventTestCollection() {
         response = await request.post("/api/user/login", { data: userLogin });
         json = await response.json();
 
-        const token = json.data.token;
-        const userId = json.data.userId;
-        expect(response.status()).toBe(200);
-        
+        // Log response for debugging
+        console.log("Login Response:", json);
 
+        const token = json?.data?.token;
+        const userId = json?.data?.userId;
+
+        // Check if token exists
+        if (!token) {
+            throw new Error("Login failed: No token received.");
+        }
+
+        expect(response.status()).toBe(200);
         //------------------------------------------------------------------------------
         // Create event
         //------------------------------------------------------------------------------
