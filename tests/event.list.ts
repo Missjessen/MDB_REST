@@ -38,6 +38,7 @@ export default function eventTestCollection() {
         const token = json.data.token;
         const userId = json.data.userId;
         expect(response.status()).toBe(200);
+        
 
         //------------------------------------------------------------------------------
         // Create event
