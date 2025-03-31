@@ -1,5 +1,3 @@
-process.env.NODE_ENV = 'test';
-
 import { test, expect } from "@playwright/test";
 
 export default function eventTestCollection() {
@@ -15,12 +13,12 @@ export default function eventTestCollection() {
             name: "Lars Larsen",
             email: "mail@larsen.com",
             password: "12345678"
-        }
+        };
 
         const userLogin = {
             email: "mail@larsen.com",
             password: "12345678"
-        }
+        };
 
         //------------------------------------------------------------------------------
         // Register user
@@ -47,6 +45,7 @@ export default function eventTestCollection() {
         }
 
         expect(response.status()).toBe(200);
+
         //------------------------------------------------------------------------------
         // Create event
         //------------------------------------------------------------------------------
@@ -62,25 +61,32 @@ export default function eventTestCollection() {
 
         response = await request.post("/api/events", {
             headers: {
-                "auth-token": token,
+                "auth-token": token,  // Inkluder token i headeren
                 "Content-Type": "application/json"
             },
             data: JSON.stringify(event)
         });
 
+        console.log("Event Creation Response:", await response.text());
+
         expect(response.status()).toBe(201);
 
         //------------------------------------------------------------------------------
-        // Verify we have one event in the test repository
+        // Verify event
         //------------------------------------------------------------------------------
-        response = await request.get("/api/events");
+        response = await request.get("/api/events", {
+            headers: {
+                "auth-token": token  // Inkluder token ved hentning
+            }
+        });
         json = await response.json();
-        const receivedEvent = json[0];
 
-        // Verifikation af event data
+        // Log hentede events for debugging
+        console.log("Events:", json);
+
+        const receivedEvent = json[0];
         expect(receivedEvent.title).toEqual(event.title);
         expect(receivedEvent.description).toEqual(event.description);
-
         expect(json).toHaveLength(1);
     });
 }
