@@ -25,7 +25,7 @@ export default function eventTestCollection() {
         //------------------------------------------------------------------------------
         let response = await request.post("/api/user/register", { data: userReg });
         let json = await response.json();
-        expect(response.status()).toBe(200);
+        expect(response.status()).toBe(201);
 
         //------------------------------------------------------------------------------
         // Login user
