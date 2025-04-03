@@ -19,23 +19,34 @@ jobs:
       JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
 
     steps:
-      - name: Use Node.JS ${{ matrix.node-version }}
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Use Node.js
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4.1.0
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Spin up MongoDB Docker instance in GitHub Actions
+      # Spin up MongoDB Docker instance
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.12.0
         with:
           mongodb-version: ${{ matrix.mongodb-version }}
 
-      # Create .env file (get rid of dotenv-flow errors)
+      # Create .env file with secrets
       - name: Create .env file
         run: |
-          touch .env
-          echo "${{secrets.API}}" >> .env
+          echo "DBHOST=${{ secrets.DBHOST }}" >> .env
+          echo "TOKEN_SECRET=${{ secrets.TOKEN_SECRET }}" >> .env
+          echo "JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}" >> .env
 
+      # Install Playwright browsers
+      - name: Install Playwright browsers
+        run: npx playwright install
+
+      # NPM Install, build, and test
       - name: NPM Install, build and test
         run: |
           npm install
