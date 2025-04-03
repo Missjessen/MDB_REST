@@ -5,7 +5,6 @@ import cors from "cors";
 import { testConnection } from "./repository/database";
 import router from "./routes";
 import { setupSwagger } from "./util/documentationSwag";
-import googleAuthRoutes from './authRoutes';
 import authRoutes from './authRoutes';
 
 
@@ -34,9 +33,9 @@ app.use(cors({
 app.use(express.json());         
 app.use(express.urlencoded({ extended: true })); 
 // Routes
-app.use('/auth', authRoutes);
+/* app.use('/auth', authRoutes);
 app.use('/api', router);
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); */
 // ======================== SERVER START ========================
 export function startServer() {
     testConnection();
@@ -47,7 +46,13 @@ export function startServer() {
     // Route setup
     app.use("/api", router);
     app.use("/api/upload", uploadRoute); 
-    app.use('/api/auth', googleAuthRoutes)
+    app.use('/auth', authRoutes);
+    app.use('/api/google', router);
+    app.use('/api/google', authRoutes);
+   
+
+
+   
 
     // Swagger documentation
     setupSwagger(app);

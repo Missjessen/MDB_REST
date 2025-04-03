@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf /dist && tsc",
-    "start": "node dist/index.js",
-    "start-dev": "cross-env NODE_ENV=development npx nodemon",
+    "start": "node --max-old-space-size=4096 dist/index.js",
+    "start-dev": "cross-env NODE_OPTIONS='--max-old-space-size=4096' NODE_ENV=development npx nodemon",
     "lint": "npx eslint",
     "testdb": "cross-env NODE_ENV=test npx ts-node ./src/index.ts",
     "test": "npx playwright test --reporter=list"

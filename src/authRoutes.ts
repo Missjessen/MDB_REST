@@ -4,13 +4,14 @@ import { setGoogleAdsId, getCustomerList, getCustomerCampaigns } from './control
 
 const router = express.Router();
 
-router.get('/google', googleLogin); 
-router.get('/google/callback', googleCallback); // 🚨 Denne rute skal matche `redirect_uri`
+// Google OAuth2 login og callback
+router.get('/auth/google', googleLogin);
+router.get('/auth/google/callback', googleCallback); // 🚨 Denne rute skal matche `redirect_uri`
 
-
-// Google Ads
+// Google Ads API endpoints
 router.post('/ads-id', setGoogleAdsId);
 router.get('/customers', getCustomerList);
 router.get('/customers/:customerId/campaigns', getCustomerCampaigns);
 
 export default router;
+
