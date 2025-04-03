@@ -17,8 +17,9 @@ export const getCustomerCampaigns: RequestHandler = async (req, res) => {
             return;
         }
 
-        const campaigns = await fetchCampaigns(user);
-        res.status(200).json({ campaigns });
+        //const campaigns = await fetchCampaigns(user);
+        //res.status(200).json({ campaigns });
+        res.status(200).json({ message: "Kampagner hentet" });
     } catch (error) {
         console.error("Fejl ved hentning af kampagner:", error);
         res.status(500).json({ error: "Fejl ved hentning af kampagner: " + error });

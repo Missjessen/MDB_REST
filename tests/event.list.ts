@@ -33,8 +33,6 @@ export default function eventTestCollection() {
         response = await request.post("/api/user/login", { data: userLogin });
         json = await response.json();
 
-        // Log response for debugging
-        console.log("Login Response:", json);
 
         const token = json?.data?.token;
         const userId = json?.data?.userId;
@@ -67,7 +65,7 @@ export default function eventTestCollection() {
             data: JSON.stringify(event)
         });
 
-        console.log("Event Creation Response:", await response.text());
+        //console.log("Event Creation Response:", await response.text());
 
         expect(response.status()).toBe(201);
 
@@ -82,7 +80,7 @@ export default function eventTestCollection() {
         json = await response.json();
 
         // Log hentede events for debugging
-        console.log("Events:", json);
+        //console.log("Events:", json);
 
         const receivedEvent = json[0];
         expect(receivedEvent.title).toEqual(event.title);
