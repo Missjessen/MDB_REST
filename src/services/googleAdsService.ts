@@ -1,5 +1,5 @@
 import { GoogleAdsApi } from 'google-ads-api';
-import { IUser } from '../interfaces/IUser';
+import { IUser } from '../interfaces/iUser';
 
 // Opretter Google Ads API-klient
 export async function getAdsClient(user: IUser) {
