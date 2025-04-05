@@ -9,7 +9,7 @@ REST API project / 2nd semester
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/Missjessen/MDB_REST)
 ![GitHub](https://img.shields.io/github/license/Missjessen/MDB_REST)
 [![Render Deployment](https://img.shields.io/badge/Render-deployed-brightgreen)](https://render.com/)
-[![Dependencies](https://img.shields.io/librariesio/github/Missjessen/MDB_REST)](https://libraries.io/github/Missjessen/MDB_REST)
+![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen)
 ![GitHub repo size](https://img.shields.io/github/repo-size/Missjessen/MDB_REST)
 ![Node.js](https://img.shields.io/badge/Node.js-16.x-green)
 ![Express.js](https://img.shields.io/badge/Express-4.x-brightgreen)
