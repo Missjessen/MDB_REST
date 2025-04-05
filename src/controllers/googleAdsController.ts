@@ -1,34 +1,10 @@
 import { Request, Response } from 'express';
 import { RequestHandler } from 'express';
-import { fetchCampaigns } from '../services/googleAdsService';
+import { listCustomers } from '../services/googleAdsService';
 import { iUserModel } from '../models/iUserModel';
 import { disconnect, connect } from '../repository/database';
 
-// Håndtering af at hente kampagner
-export const getCustomerCampaigns: RequestHandler = async (req, res) => {
-    const { customerId } = req.params;
 
-    try {
-        await connect();
-        const user = await iUserModel.findOne({ googleAdsCustomerId: customerId });
-
-        if (!user) {
-            res.status(404).json({ error: "Kunde ikke fundet" });
-            return;
-        }
-
-        //const campaigns = await fetchCampaigns(user);
-        //res.status(200).json({ campaigns });
-        res.status(200).json({ message: "Kampagner hentet" });
-    } catch (error) {
-        console.error("Fejl ved hentning af kampagner:", error);
-        res.status(500).json({ error: "Fejl ved hentning af kampagner: " + error });
-    } finally {
-      setTimeout(async () => {
-          await disconnect();
-      }, 1000);
-  }
-};
 
 // POST /api/google/ads-id
 export const setGoogleAdsId: RequestHandler = async (req, res) => {
@@ -80,3 +56,73 @@ export const getCustomerList: RequestHandler = async (req, res) => {
   }
 
 };
+
+
+
+
+
+/* export const getCustomerList = async (req: Request, res: Response) => {
+    try {
+        const customers = await listCustomers();
+        res.status(200).json(customers);
+    } catch (error) {
+        res.status(500).json({ error: "Fejl ved hentning af kunder: " + error });
+    }
+}; */
+
+/* export const getCustomerCampaigns = async (req: Request, res: Response) => {
+    const { customerId } = req.params;
+    const { refreshToken } = req.query; // Forventer refreshToken i forespørgsel
+
+    try {
+        if (!customerId || !refreshToken) {
+            return res.status(400).json({ error: "Kunde ID eller Refresh Token mangler" });
+        }
+
+        // Hent kampagner via service-funktionen
+        const campaigns = await fetchCampaignsWithGAQL(customerId, refreshToken as string);
+
+        if (campaigns.length === 0) {
+            return res.status(404).json({ message: "Ingen kampagner fundet" });
+        }
+
+        res.status(200).json({ campaigns });
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("Fejl i controller ved hentning af kampagner:", error.message);
+        } else {
+            console.error("Fejl i controller ved hentning af kampagner:", error);
+        }
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        res.status(500).json({ error: "Fejl ved hentning af kampagner: " + errorMessage });
+    }
+}; */
+
+/* export const getCustomerCampaigns: RequestHandler = async (req, res) => {
+    const { customerId } = req.params;
+
+    try {
+        await connect();
+        const user = await iUserModel.findOne({ googleAdsCustomerId: customerId });
+
+        if (!user) {
+            res.status(404).json({ error: "Kunde ikke fundet" });
+            return;
+        }
+
+        const campaigns = await fetchCampaigns(user);
+
+        if (!campaigns || campaigns.length === 0) {
+            res.status(404).json({ message: "Ingen kampagner fundet for kunden." });
+            return;
+        }
+
+        res.status(200).json({ campaigns });
+    } catch (error) {
+        console.error("Fejl ved hentning af kampagner:", error);
+        res.status(500).json({ error: "Fejl ved hentning af kampagner: " + error });
+    } finally {
+        await disconnect();
+    }
+};
+ */

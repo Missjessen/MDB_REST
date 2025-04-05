@@ -35,6 +35,7 @@ export async function googleLogin(req: Request, res: Response) {
                 process.env.GOOGLE_CLIENT_SECRET!,
                 process.env.GOOGLE_REDIRECT_URI!
               );
+              
         
             if (!code) {
                 res.status(400).json({ error: 'Manglende kode fra Google' });
@@ -101,7 +102,7 @@ async function saveTokensToDatabase(userId: string, tokens: any) {
             refreshToken: tokens.refresh_token,
             expiryDate: new Date(tokens.expiry_date as number)
         },
-        
+
         { upsert: true }
     );
     

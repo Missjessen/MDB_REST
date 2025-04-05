@@ -1,6 +1,6 @@
 import express from 'express';
 import { googleLogin, googleCallback } from './controllers/googleAuthController';
-import { setGoogleAdsId, getCustomerList, getCustomerCampaigns } from './controllers/googleAdsController';
+import { setGoogleAdsId, getCustomerList } from './controllers/googleAdsController';
 
 const router = express.Router();
 
@@ -11,7 +11,8 @@ router.get('/auth/google/callback', googleCallback); // 🚨 Denne rute skal mat
 // Google Ads API endpoints
 router.post('/ads-id', setGoogleAdsId);
 router.get('/customers', getCustomerList);
-router.get('/customers/:customerId/campaigns', getCustomerCampaigns);
+//router.get('/customers/:customerId/campaigns', getCustomerCampaigns);
 
 export default router;
+
 
