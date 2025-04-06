@@ -1,8 +1,7 @@
 REST API project / 2nd semester
 
 # API Backend Project
-
-[![Node.js CI/CD](https://github.com/Missjessen/MDB_REST/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/Missjessen/MDB_REST/actions)
+[![Node.js CI/CD](https://github.com/Missjessen/MDB_REST/actions/workflows/main.yml/badge.svg)](https://github.com/Missjessen/MDB_REST/actions)
 
 
 
