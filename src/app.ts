@@ -9,8 +9,8 @@ import authRoutes from './authRoutes';
 
 
 
-//import dotenv from 'dotenv';
-//dotenv.config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 
 dotenvFlow.config();
@@ -44,11 +44,11 @@ export function startServer() {
     app.options("*", cors());
 
     // Route setup
+   
     app.use("/api", router);
     app.use("/api/upload", uploadRoute); 
     app.use('/auth', authRoutes);
-    app.use('/api/google', router);
-    app.use('/api/google', authRoutes);
+    app.use('/api/google', authRoutes); 
    
 
 

@@ -25,7 +25,7 @@ function setup() {
     test.beforeEach(async () => {
         try {
             await connect();
-            await clearDatabase();  // Brug clearDatabase til at rydde alle kollektioner
+            await clearDatabase();  
         } finally {
             await disconnect();
         }
@@ -35,7 +35,7 @@ function setup() {
     test.afterAll(async () => {
         try {
             await connect();
-            await clearDatabase();  // Brug clearDatabase igen for at sikre en tom database
+            await clearDatabase(); 
         } finally {
             await disconnect();
         }

@@ -1,2 +1,0 @@
-name: create env file
-run

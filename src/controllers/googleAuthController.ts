@@ -35,7 +35,6 @@ export async function googleLogin(req: Request, res: Response) {
                 process.env.GOOGLE_CLIENT_SECRET!,
                 process.env.GOOGLE_REDIRECT_URI!
               );
-              
         
             if (!code) {
                 res.status(400).json({ error: 'Manglende kode fra Google' });
@@ -94,17 +93,14 @@ export async function googleLogin(req: Request, res: Response) {
   
 
 
-async function saveTokensToDatabase(userId: string, tokens: any) {
-    await iUserModel.findOneAndUpdate(
-        { googleAdsId: userId },
-        {
-            accessToken: tokens.access_token,
-            refreshToken: tokens.refresh_token,
-            expiryDate: new Date(tokens.expiry_date as number)
-        },
-
-        { upsert: true }
-    );
-    
-}
-
+        async function saveTokensToDatabase(userId: string, tokens: any) {
+            await iUserModel.findOneAndUpdate(
+                { googleAdsId: userId },
+                {
+                    accessToken: tokens.access_token,
+                    refreshToken: tokens.refresh_token,
+                    expiryDate: new Date(tokens.expiry_date as number),
+                },
+                { upsert: true }
+            );
+        }

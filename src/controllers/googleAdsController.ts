@@ -4,7 +4,16 @@ import { listCustomers } from '../services/googleAdsService';
 import { iUserModel } from '../models/iUserModel';
 import { disconnect, connect } from '../repository/database';
 
+import { createTestAccount } from "../services/googleAds/createTestAccount";
 
+export const createGoogleAdsTestAccount = async (req: Request, res: Response) => {
+    try {
+        const result = await createTestAccount();
+        res.status(200).json({ message: "Testkonto oprettet", data: result });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 // POST /api/google/ads-id
 export const setGoogleAdsId: RequestHandler = async (req, res) => {
