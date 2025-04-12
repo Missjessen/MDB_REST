@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import express, { Application } from "express";
 import dotenvFlow from "dotenv-flow";
 import uploadRoute from "./uploadRoute"; 
@@ -6,6 +7,7 @@ import { testConnection } from "./repository/database";
 import router from "./routes";
 import { setupSwagger } from "./util/documentationSwag";
 import authRoutes from './authRoutes';
+
 
 
 
@@ -19,15 +21,22 @@ dotenvFlow.config();
 const app: Application = express();
 
 // ======================== CORS SETUP ========================
-app.use(cors({
-    origin: '*', 
-    methods: "GET,POST,PUT,DELETE,OPTIONS,HEAD", 
-    allowedHeaders: [
-        'Content-Type', 'Authorization', 'auth-token', 
-        'Origin', 'X-Requested-With', 'Accept'
-    ],
-    credentials: true
-}));
+const allowedOrigins = 
+process.env.ALLOWED_ORIGINS?.split(',') || [];
+  
+  app.use(cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('CORS-fejl: Origin ikke tilladt'));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'auth-token']
+  }));
+
 
 // ======================== MIDDLEWARE SETUP ========================
 app.use(express.json());         
@@ -44,13 +53,13 @@ export function startServer() {
     app.options("*", cors());
 
     // Route setup
-   
+    app.use(cookieParser()); // 🧠 Dette tilføjer req.cookies
     app.use("/api", router);
-    app.use("/api/upload", uploadRoute); 
+    //app.use("/api/upload", uploadRoute); 
     app.use('/auth', authRoutes);
-    app.use('/api/google', authRoutes); 
+    //app.use('/api/google', authRoutes); 
    
-
+   
 
    
 

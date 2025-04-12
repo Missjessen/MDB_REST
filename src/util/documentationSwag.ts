@@ -85,11 +85,11 @@ export function setupSwagger(app: Application) {
 
     const options = {
         swaggerDefinition,
-        apis: ['**/*.ts'], 
-    };
-
-    const swaggerSpec = swaggerJsdoc(options);
-    app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+        apis: ['./src/views/*.ts'], // Matcher dine route-filer
+      };
+      
+      const swaggerSpec = swaggerJsdoc(options);
+      app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }
 
 
