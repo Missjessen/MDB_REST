@@ -1,4 +1,4 @@
-import express from 'express';
+/* import express from 'express';
 import { googleLogin, googleCallback, getMe } from './controllers/googleAuthController';
 import { setGoogleAdsId, getCustomerList,createGoogleAdsTestAccount } from './controllers/googleAdsController';
 import { requireAuth } from './middleware/requireAuth';
@@ -21,7 +21,8 @@ router.post("/create-test-account", createGoogleAdsTestAccount);//Opretter testk
 //sheets
 router.post('/sheet-id', setSheetId);
 router.post('/create-sheet', requireAuth, createAndSaveSheet); // skal beskyttes
+router.get('/google/sheet-link', requireAuth, getSheetLink);
 
 export default router;
 
-
+ */

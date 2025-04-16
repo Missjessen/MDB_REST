@@ -1,4 +1,65 @@
+// services/googleAdsService.ts
 import { GoogleAdsApi } from 'google-ads-api';
+import { IUser } from '../interfaces/iUser';
+
+const googleAdsClient = new GoogleAdsApi({
+  client_id: process.env.GOOGLE_CLIENT_ID!,
+  client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+  developer_token: process.env.GOOGLE_DEVELOPER_TOKEN!
+});
+
+/**
+ * Returnerer en Google Ads API-klient for en specifik bruger
+ * @param user - Bruger med refreshToken og googleAdsCustomerId
+ * @returns En autoriseret kundeinstans fra GoogleAdsApi
+ */
+export function getAdsClient(user: IUser) {
+  if (!user.refreshToken || !user.googleAdsCustomerId) {
+    throw new Error("Bruger mangler Ads-forbindelse");
+  }
+
+  return googleAdsClient.Customer({
+    customer_id: user.googleAdsCustomerId,
+    login_customer_id: user.googleAdsCustomerId,
+    refresh_token: user.refreshToken
+  });
+}
+
+/**
+ * Henter de første 10 kampagner for en bruger fra Google Ads
+ * @param user - Bruger med Google Ads adgang
+ * @returns En liste af kampagner (id, navn, status)
+ */
+export async function getCampaignsForUser(user: IUser) {
+  const client = getAdsClient(user);
+
+  const response = await client.query(`
+    SELECT
+      campaign.id,
+      campaign.name,
+      campaign.status
+    FROM campaign
+    LIMIT 10
+  `);
+
+  return response;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* import { GoogleAdsApi } from 'google-ads-api';
 import { IUser } from '../interfaces/iUser';
 
 // Opretter Google Ads API-klient
@@ -23,6 +84,31 @@ export async function getAdsClient(user: IUser) {
 }
 
   
+
+
+   const client = new GoogleAdsApi({
+        client_id: process.env.GOOGLE_CLIENT_ID!,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+        developer_token: process.env.GOOGLE_DEVELOPER_TOKEN!,
+    });
+    
+    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN!; 
+    
+    export async function listCustomers() {
+        try {
+            const customers = await client.listAccessibleCustomers(refreshToken);
+            return customers;
+        } catch (error) {
+            console.error("Fejl ved hentning af kunder:", error);
+            throw error;
+        }
+    }
+ */
+
+
+
+
+
 /*   export const getCustomer = (customerId: string, refreshToken: string) => {
     return client.Customer({
       customer_id: customerId,
@@ -51,31 +137,6 @@ export async function getAdsClient(user: IUser) {
         throw error;
     }
 } */
-
-   const client = new GoogleAdsApi({
-        client_id: process.env.GOOGLE_CLIENT_ID!,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        developer_token: process.env.GOOGLE_DEVELOPER_TOKEN!,
-    });
-    
-    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN!; 
-    
-    export async function listCustomers() {
-        try {
-            const customers = await client.listAccessibleCustomers(refreshToken);
-            return customers;
-        } catch (error) {
-            console.error("Fejl ved hentning af kunder:", error);
-            throw error;
-        }
-    }
-
-
-
-
-
-
-
 
 
 

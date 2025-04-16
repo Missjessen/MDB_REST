@@ -3,8 +3,13 @@ import jwt from 'jsonwebtoken';
 import { Response, NextFunction } from 'express';
 
 export const requireAuth = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
-  const token = req.cookies.token;
-
+  const bearerHeader = req.headers.authorization;
+  const token =
+    req.cookies.token ||
+    (bearerHeader && bearerHeader.startsWith("Bearer ")
+      ? bearerHeader.split(" ")[1]
+      : null);
+      
   if (!token) {
     res.status(401).json({ error: 'Ingen adgang. Mangler token.' });
     return;

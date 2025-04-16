@@ -1,12 +1,13 @@
 import cookieParser from 'cookie-parser';
 import express, { Application } from "express";
 import dotenvFlow from "dotenv-flow";
-import uploadRoute from "./uploadRoute"; 
 import cors from "cors";  
 import { testConnection } from "./repository/database";
 import router from "./routes";
 import { setupSwagger } from "./util/documentationSwag";
-import authRoutes from './authRoutes';
+import authRoutes from './routes/authRoutes';
+import adsRoutes from './routes/adsRoutes';
+import sheetsRoutes from './routes/sheetsRoutes';
 
 
 
@@ -54,10 +55,10 @@ export function startServer() {
 
     // Route setup
     app.use(cookieParser()); // 🧠 Dette tilføjer req.cookies
-    app.use("/api", router);
-    //app.use("/api/upload", uploadRoute); 
-    app.use('/auth', authRoutes);
-    //app.use('/api/google', authRoutes); 
+    app.use("/api", router); 
+    app.use('/api/auth', authRoutes);
+    app.use('/api/ads', adsRoutes);
+    app.use('/api/sheets', sheetsRoutes);
    
    
 

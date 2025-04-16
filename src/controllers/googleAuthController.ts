@@ -1,4 +1,125 @@
+import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { connect, disconnect } from '../repository/database';
+import {
+  createOAuthClient,
+  verifyGoogleCode,
+  saveOrUpdateGoogleUser
+} from '../services/googleAuthService';
+import { AuthenticatedRequest } from '../interfaces/userReq';
+
+
+/**
+ * Starter Google OAuth2 login flow.
+ * Redirecter brugeren til Googles samtykkeside.
+ *
+ * Scopes inkluderer:
+ * - Google Ads adgang
+ * - Google Sheets adgang
+ * - Brugerens e-mail og profiloplysninger
+ * 
+ * @param req - Express Request-objekt
+ * @param res - Express Response-objekt
+ */
+
+export async function googleLogin(req: Request, res: Response) {
+  const client = createOAuthClient();
+
+  const url = client.generateAuthUrl({
+    access_type: 'offline',
+    prompt: 'consent',
+    scope: [
+      'https://www.googleapis.com/auth/adwords',
+      'https://www.googleapis.com/auth/spreadsheets',
+      'https://www.googleapis.com/auth/userinfo.email',
+      'https://www.googleapis.com/auth/userinfo.profile'
+    ]
+  });
+
+  res.redirect(url);
+}
+
+/**
+ * Callback endpoint fra Google OAuth2 flow.
+ * Validerer adgangskoden (authorization code),
+ * henter adgangstoken og brugerdata, og gemmer/ opdaterer brugeren i databasen.
+ * Opretter herefter JWT-token og sætter det som httpOnly-cookie.
+ *
+ * Fejltyper håndteres med passende HTTP-statuskoder:
+ * - 400: Manglende eller ugyldig kode
+ * - 500: Databasefejl eller tokenfejl
+ * 
+ * @param req - Express Request-objekt
+ * @param res - Express Response-objekt
+ */
+
+export async function googleCallback(req: Request, res: Response) {
+  const { code } = req.query;
+
+  if (!code) {
+    res.status(400).json({ error: 'Manglende kode fra Google' });
+    return;
+  }
+
+  try {
+    await connect();
+
+    const { tokens, profile } = await verifyGoogleCode(code as string);
+    const user = await saveOrUpdateGoogleUser(profile, tokens);
+
+    if (!user) {
+      res.status(500).json({ error: 'Fejl under lagring af bruger' });
+      return;
+    }
+
+    const jwtToken = jwt.sign(
+      {
+        _id: user._id.toString(),
+        email: user.email,
+        googleId: user.googleId
+      },
+      process.env.JWT_SECRET!,
+      { expiresIn: '7d' }
+    );
+
+    res.cookie("token", jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    res.status(200).json({ message: 'Login OK', user, token: jwtToken });
+
+  } catch (error) {
+    console.error("❌ Fejl under Google callback:", error);
+    res.status(500).json({ error: 'Fejl under login-processen' });
+  } finally {
+    await disconnect();
+  }
+}
+
+/**
+ * Returnerer oplysninger om den aktuelt loggede ind bruger.
+ * Forudsætter at `requireAuth` middleware allerede har valideret JWT-token.
+ * 
+ * @param req - Request med bruger fra JWT
+ * @param res - JSON-svar med brugerdata eller 401 hvis ikke logget ind
+ */
+
+export const getMe = (req: AuthenticatedRequest, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ error: 'Ikke logget ind' });
+    return;
+  }
+
+  res.json({
+    message: "Du er logget ind ✅",
+    user: req.user
+  });
+};
+
+/* import jwt from 'jsonwebtoken';
 import { Request, Response} from 'express';
 import { iUserModel } from '../models/iUserModel';
 import { google } from 'googleapis';
@@ -138,3 +259,4 @@ export async function googleLogin(req: Request, res: Response) {
                 { upsert: true }
             );
         }
+ */
