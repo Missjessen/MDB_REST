@@ -4,34 +4,11 @@ import { iUserModel } from '../models/iUserModel';
 import { connect, disconnect } from '../repository/database';
 import { getCampaignsForUser } from '../services/googleAdsService';
 import { createTestAccount } from '../services/googleAds/createTestAccount';
+//import { syncSheetToAds } from '../services/googleAdsSyncService';
+import { google } from 'googleapis';
+import { AuthenticatedRequest } from '../interfaces/userReq';
 
-/**
- * Henter kampagner for en bruger med Google Ads adgang
- * @route GET /api/campaigns/:userId
- * @param req.params.userId - ID på brugeren (fra iUserModel)
- * @returns Liste af kampagner
- */
-export const getUserCampaigns = async (req: Request, res: Response) => {
-  const { userId } = req.params;
 
-  try {
-    await connect();
-
-    const user = await iUserModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'Bruger ikke fundet' });
-    }
-
-    const campaigns = await getCampaignsForUser(user);
-    res.status(200).json({ campaigns });
-
-  } catch (err: any) {
-    console.error("Fejl ved hentning af kampagner:", err);
-    res.status(500).json({ error: err.message || 'Fejl ved hentning af kampagner' });
-  } finally {
-    await disconnect();
-  }
-};
 
 
 /**
@@ -96,7 +73,34 @@ export const createGoogleAdsTestAccount = async (req: Request, res: Response): P
   };
   
 
-
+ /*  export const syncSheetHandler = async (req: AuthenticatedRequest, res: Response) => {
+    const user = req.user;
+    if (!user || !user._id) return res.status(401).json({ error: "Login kræves" });
+  
+    try {
+      await connect();
+      const userDoc = await iUserModel.findById(user._id);
+      if (!userDoc || !userDoc.sheetId || !userDoc.refreshToken) {
+        return res.status(400).json({ error: "Bruger mangler Sheet eller refresh token" });
+      }
+  
+      const oAuthClient = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID!,
+        process.env.GOOGLE_CLIENT_SECRET!,
+        process.env.GOOGLE_REDIRECT_URI!
+      );
+      oAuthClient.setCredentials({ refresh_token: userDoc.refreshToken });
+  
+      const result = await syncSheetToAds(oAuthClient, userDoc._id.toString());
+      res.status(200).json(result);
+  
+    } catch (error) {
+      res.status(500).json({ error: "Fejl under synkronisering", details: error });
+    } finally {
+      await disconnect();
+    }
+  }; */
+  
 
 
 

@@ -4,6 +4,9 @@ export interface JwtUserPayload {
     _id: string;
     email: string;
     googleId: string;
+    refreshToken: string; // 👈 tilføj denne linje
+    accessToken: string; // 👈
+    
   }
   
   // 👇 Denne bruges i middleware og controllers

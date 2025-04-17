@@ -19,7 +19,7 @@
     "noImplicitAny": true,
     "skipLibCheck": true
   },
-  "include": ["./src"],
+  "include": ["./src", "src/__mocks__"],
   "exclude": ["node_modules/**/**"]
 }
 

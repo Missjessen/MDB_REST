@@ -1,5 +1,8 @@
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
+import { getGoogleAccessToken } from './googleAuthService';
+
+
 
 /**
  * Opretter et Google Sheet med standardstruktur (Kampagner, Annoncer, Keywords, Forklaring)
@@ -82,31 +85,55 @@ export async function createUserSheet(oAuthClient: OAuth2Client, title: string):
 
   return spreadsheetId;
 }
+// googleSheetsService.ts
+
+import fetch from 'node-fetch';
 
 
-/* import { GoogleAdsApi } from 'google-ads-api';
-import { IUser } from '../interfaces/iUser';
-
-// Opretter Google Ads API-klient
-
-export async function getAdsClient(user: IUser) {
-    try {
-        const client = new GoogleAdsApi({
-            client_id: process.env.GOOGLE_CLIENT_ID!,
-            client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-            developer_token: process.env.GOOGLE_DEVELOPER_TOKEN!,
-        });
-
-        return client.Customer({
-            customer_id: process.env.GOOGLE_TEST_ACCOUNT_ID!,      // Testkontoens ID
-            login_customer_id: process.env.GOOGLE_TEST_ACCOUNT_ID!, // Samme ID her
-            refresh_token: user.refreshToken!,
-        });
-    } catch (error) {
-        console.error("Fejl ved oprettelse af Google Ads klient: ", error);
-        throw error;
-    }
+export interface ParsedCampaign {
+  name: string;
+  status: 'ENABLED' | 'PAUSED';
+  startDate: string;
+  endDate: string;
 }
-// Henter sheets fra Google Sheets API
 
- */
+export async function parseCampaignsFromSheet(oAuthClient: OAuth2Client, sheetId: string): Promise<ParsedCampaign[]> {
+  const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
+  const range = 'Kampagner!A2:E';
+
+  const result = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range,
+  });
+
+  const rows = result.data.values;
+  if (!rows || rows.length === 0) return [];
+
+  const campaigns: ParsedCampaign[] = [];
+  for (let i = 0; i < rows.length; i++) {
+    const [name, status, , startDate, endDate] = rows[i];
+    if (!name || !status || !startDate || !endDate) continue;
+
+    campaigns.push({
+      name,
+      status: status.toUpperCase() === 'PAUSED' ? 'PAUSED' : 'ENABLED',
+      startDate,
+      endDate
+    });
+  }
+
+  return campaigns;
+}
+
+export async function writeStatusToSheet(oAuthClient: OAuth2Client, sheetId: string, statuses: string[]) {
+  const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `Kampagner!F2:F${statuses.length + 1}`,
+    valueInputOption: 'RAW',
+    requestBody: {
+      values: statuses.map(status => [status])
+    }
+  });
+}

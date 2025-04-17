@@ -76,7 +76,8 @@ export async function googleCallback(req: Request, res: Response) {
       {
         _id: user._id.toString(),
         email: user.email,
-        googleId: user.googleId
+        googleId: user.googleId,
+        refreshToken: user.refreshToken  // 👈 DU SKAL TILFØJE DENNE
       },
       process.env.JWT_SECRET!,
       { expiresIn: '7d' }

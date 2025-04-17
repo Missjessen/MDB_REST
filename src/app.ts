@@ -8,6 +8,8 @@ import { setupSwagger } from "./util/documentationSwag";
 import authRoutes from './routes/authRoutes';
 import adsRoutes from './routes/adsRoutes';
 import sheetsRoutes from './routes/sheetsRoutes';
+import { generalLimiter } from './middleware/rateLimiter';
+
 
 
 
@@ -20,6 +22,7 @@ dotenvFlow.config();
 
 // ======================== APP INITIALIZATION ========================
 const app: Application = express();
+
 
 // ======================== CORS SETUP ========================
 const allowedOrigins = 
@@ -40,12 +43,12 @@ process.env.ALLOWED_ORIGINS?.split(',') || [];
 
 
 // ======================== MIDDLEWARE SETUP ========================
+
+app.use(generalLimiter); 
+
 app.use(express.json());         
 app.use(express.urlencoded({ extended: true })); 
-// Routes
-/* app.use('/auth', authRoutes);
-app.use('/api', router);
-app.use('/api/auth', authRoutes); */
+
 // ======================== SERVER START ========================
 export function startServer() {
     testConnection();
@@ -56,7 +59,7 @@ export function startServer() {
     // Route setup
     app.use(cookieParser()); // 🧠 Dette tilføjer req.cookies
     app.use("/api", router); 
-    app.use('/api/auth', authRoutes);
+    app.use('/auth', authRoutes);
     app.use('/api/ads', adsRoutes);
     app.use('/api/sheets', sheetsRoutes);
    
@@ -71,4 +74,7 @@ export function startServer() {
     const PORT: number = parseInt(process.env.PORT as string) || 4000;
 
     app.listen(PORT, () => console.log(`Server is running on port: ${PORT}`));
+    
 }
+// For testing, export the app instance
+export default app;

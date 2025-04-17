@@ -57,8 +57,6 @@ export async function getCampaignsForUser(user: IUser) {
 
 
 
-
-
 /* import { GoogleAdsApi } from 'google-ads-api';
 import { IUser } from '../interfaces/iUser';
 

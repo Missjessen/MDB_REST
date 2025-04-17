@@ -3,7 +3,7 @@ import {
   setGoogleAdsId,
   getCustomerList,
   createGoogleAdsTestAccount,
-  getUserCampaigns
+  
 } from '../controllers/googleAdsController';
 import { requireAuth } from '../middleware/requireAuth';
 
