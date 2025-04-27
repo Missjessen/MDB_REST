@@ -1,4 +1,4 @@
-// services/campaignService.ts
+/* // services/campaignService.ts
 import { parseCampaignsFromSheet } from './googleSheetsService';
 import { iUserModel } from '../models/iUserModel';
 import { CampaignModel } from '../models/CampaignModel';
@@ -29,3 +29,4 @@ export async function saveCampaignsFromSheetToDB(oAuthClient: OAuth2Client, user
 
   return results;
 }
+ */

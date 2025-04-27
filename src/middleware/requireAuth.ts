@@ -1,25 +1,43 @@
-import { JwtUserPayload, AuthenticatedRequest } from '../interfaces/userReq';
+// src/middleware/requireAuth.ts
+import { RequestHandler, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { Response, NextFunction } from 'express';
+import { AuthenticatedRequest, JwtUserPayload } from '../interfaces/userReq';
 
-export const requireAuth = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
-  const bearerHeader = req.headers.authorization;
+export const requireAuth: RequestHandler = (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): void => {
+  // Hent JWT fra cookie eller Authorization-header
+  const authHeader = req.headers.authorization;
   const token =
-    req.cookies.token ||
-    (bearerHeader && bearerHeader.startsWith("Bearer ")
-      ? bearerHeader.split(" ")[1]
+    req.cookies.token ??
+    (authHeader && authHeader.startsWith('Bearer ')
+      ? authHeader.split(' ')[1]
       : null);
-      
+
   if (!token) {
+    // Sender svar og stopper funktionen
     res.status(401).json({ error: 'Ingen adgang. Mangler token.' });
     return;
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtUserPayload;
-    req.user = decoded;
-    next();
+    // Fold payload ud på req.user
+    req.user = {
+      _id: decoded._id,
+      email: decoded.email,
+      googleId: decoded.googleId,
+      refreshToken: decoded.refreshToken,
+      accessToken: decoded.accessToken,
+      iat: decoded.iat,
+      exp: decoded.exp
+    };
+    next(); // Går videre til næste middleware/handler
   } catch (err) {
-    res.status(401).json({ error: 'Ugyldigt token.' });
+    // Sender svar og stopper funktionen
+    res.status(401).json({ error: 'Ugyldigt eller udløbet token.' });
+    return;
   }
 };

@@ -1,4 +1,4 @@
-import { Response } from 'express';
+/* import { Response } from 'express';
 import { AuthenticatedRequest } from '../interfaces/userReq';
 import { createOAuthClient } from '../services/googleAuthService';
 import { createUserSheet } from '../services/googleSheetsService';
@@ -27,3 +27,4 @@ export const createSheet = async (req: AuthenticatedRequest, res: Response): Pro
     res.status(500).json({ error: err.message || 'Fejl ved oprettelse af sheet' });
   }
 };
+ */

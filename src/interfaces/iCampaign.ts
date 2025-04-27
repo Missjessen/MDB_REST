@@ -1,6 +1,7 @@
+// src/interfaces/ICampaign.ts
 import { Types } from 'mongoose';
-
 export interface ICampaign {
+  _id?: Types.ObjectId;
   userId: Types.ObjectId;
   sheetId: string;
   name: string;
@@ -8,9 +9,5 @@ export interface ICampaign {
   startDate: string;
   endDate: string;
   budget?: number;
-  advertisingChannelType?: string;
-  headlines?: string[];
-  descriptions?: string[];
-  keywords?: string[];
   createdAt?: Date;
 }

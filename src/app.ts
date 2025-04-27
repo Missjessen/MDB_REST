@@ -6,8 +6,10 @@ import { testConnection } from "./repository/database";
 import router from "./routes";
 import { setupSwagger } from "./util/documentationSwag";
 import authRoutes from './routes/authRoutes';
-import adsRoutes from './routes/adsRoutes';
+
 import sheetsRoutes from './routes/sheetsRoutes';
+//import deployRoutes from './routes/deployRoutes';
+
 import { generalLimiter } from './middleware/rateLimiter';
 
 
@@ -60,8 +62,10 @@ export function startServer() {
     app.use(cookieParser()); // 🧠 Dette tilføjer req.cookies
     app.use("/api", router); 
     app.use('/auth', authRoutes);
-    app.use('/api/ads', adsRoutes);
+  
     app.use('/api/sheets', sheetsRoutes);
+    //app.use('/api/deploy', deployRoutes);
+
    
    
 

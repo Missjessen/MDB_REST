@@ -10,84 +10,102 @@ import { getGoogleAccessToken } from './googleAuthService';
  * @param title - Titel på arket
  * @returns Sheet ID
  */
+
+/**
+ * Create a single "AllResources" sheet with header row and color.
+ */
 export async function createUserSheet(oAuthClient: OAuth2Client, title: string): Promise<string> {
   const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
-
-  const response = await sheets.spreadsheets.create({
+  const resp = await sheets.spreadsheets.create({
     requestBody: {
       properties: { title },
-      sheets: [
-        { properties: { title: 'Kampagner', gridProperties: { frozenRowCount: 1 } } },
-        { properties: { title: 'Annoncer', gridProperties: { frozenRowCount: 1 } } },
-        { properties: { title: 'Keywords', gridProperties: { frozenRowCount: 1 } } },
-        { properties: { title: 'Forklaring' } }
-      ]
+      sheets: [{ properties: { title: 'AllResources', gridProperties: { frozenRowCount: 1 } } }]
     }
   });
+  const spreadsheetId = resp.data.spreadsheetId!;
+  const sheetId = resp.data.sheets![0].properties!.sheetId!;
 
-  const spreadsheetId = response.data.spreadsheetId!;
-  const sheetIdMap = (response.data.sheets ?? []).reduce((acc, sheet) => {
-    acc[sheet.properties!.title!] = sheet.properties!.sheetId!;
-    return acc;
-  }, {} as Record<string, number>);
+  const headers = [
+    'resourceType','id','parentId','name','budget','status',
+    'startDate','endDate','headline1','headline2',
+    'description','finalUrl','keywordText','matchType',
+    'action','syncStatus'
+  ];
 
-  await sheets.spreadsheets.values.batchUpdate({
+  await sheets.spreadsheets.values.update({
     spreadsheetId,
-    requestBody: {
-      valueInputOption: 'RAW',
-      data: [
-        {
-          range: 'Kampagner!A1:E1',
-          values: [['Campaign Name', 'Status', 'Budget', 'Start Date', 'End Date']]
-        },
-        {
-          range: 'Annoncer!A1:F1',
-          values: [['Ad Group', 'Headline 1', 'Headline 2', 'Description', 'Final URL', 'Path']]
-        },
-        {
-          range: 'Keywords!A1:D1',
-          values: [['Ad Group', 'Keyword', 'Match Type', 'CPC']]
-        },
-        {
-          range: 'Forklaring!A1',
-          values: [[
-            'Dette ark er opdelt i 3 hovedark: Kampagner, Annoncer og Keywords.\n\n' +
-            '- Udfyld en række pr. kampagne, annonce eller søgeord.\n' +
-            '- Brug validerede værdier som status = Enabled/Paused, matchtype = Broad/Phrase/Exact.\n' +
-            '- Dette ark er forbundet til Google Ads API og kan automatisk synkroniseres.'
-          ]]
-        }
-      ]
-    }
+    range: 'AllResources!A1:P1',
+    valueInputOption: 'RAW',
+    requestBody: { values: [headers] }
   });
-
-  const requests = ['Kampagner', 'Annoncer', 'Keywords'].map(sheetName => ({
-    repeatCell: {
-      range: {
-        sheetId: sheetIdMap[sheetName],
-        startRowIndex: 0,
-        endRowIndex: 1
-      },
-      cell: {
-        userEnteredFormat: {
-          backgroundColor: { red: 1, green: 0.95, blue: 0.75 },
-          textFormat: { bold: true }
-        }
-      },
-      fields: 'userEnteredFormat(backgroundColor,textFormat)'
-    }
-  }));
 
   await sheets.spreadsheets.batchUpdate({
     spreadsheetId,
-    requestBody: { requests }
-  });
+    requestBody: { requests: [{
+      repeatCell: {
+        range: { sheetId, startRowIndex:0, endRowIndex:1 },
+        cell: { userEnteredFormat: { backgroundColor:{ red:1,green:0.95,blue:0.75 }, textFormat:{ bold:true } } },
+        fields: 'userEnteredFormat(backgroundColor,textFormat)'
+      }
+    }]} }
+  );
 
-  return spreadsheetId;
-}
-// googleSheetsService.ts
+    return spreadsheetId;
+  }
 
-import fetch from 'node-fetch';
+// export async function createUserSheet(oAuthClient: OAuth2Client, title: string): Promise<string> {
+//   const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
+
+//   const response = await sheets.spreadsheets.create({
+//     requestBody: {
+//       properties: { title },
+//       sheets: [
+//         { properties: { title: 'Kampagner', gridProperties: { frozenRowCount: 1 } } },
+//         { properties: { title: 'Annoncer', gridProperties: { frozenRowCount: 1 } } },
+//         { properties: { title: 'Keywords', gridProperties: { frozenRowCount: 1 } } },
+//         { properties: { title: 'Forklaring' } }
+//       ]
+//     }
+//   });
+
+//   const spreadsheetId = response.data.spreadsheetId!;
+//   const sheetIdMap = (response.data.sheets ?? []).reduce((acc, sheet) => {
+//     acc[sheet.properties!.title!] = sheet.properties!.sheetId!;
+//     return acc;
+//   }, {} as Record<string, number>);
+
+//   // Sæt headers i de 3 ark
+//   await sheets.spreadsheets.values.batchUpdate({
+//     spreadsheetId,
+//     requestBody: {
+//       valueInputOption: 'RAW',
+//       data: [
+//         { range: 'Kampagner!A1:E1', values: [['Campaign Name','Status','Budget','Start Date','End Date']] },
+//         { range: 'Annoncer!A1:F1', values: [['Ad Group','Headline 1','Headline 2','Description','Final URL','Path']] },
+//         { range: 'Keywords!A1:D1', values: [['Ad Group','Keyword','Match Type','CPC']] },
+//         { range: 'Forklaring!A1',  values: [[
+//             'Dette ark er opdelt i 3 hovedark: Kampagner, Annoncer og Keywords.\n\n' +
+//             '- Udfyld en række pr. kampagne, annonce eller søgeord.\n' +
+//             '- Brug validerede værdier som status = Enabled/Paused, matchtype = Broad/Phrase/Exact.\n' +
+//             '- Dette ark er forbundet til Google Ads API og kan automatisk synkroniseres.'
+//         ]] }
+//       ]
+//     }
+//   });
+
+//   // Farv header-rækker
+//   const requests = ['Kampagner','Annoncer','Keywords'].map(title => ({
+//     repeatCell: {
+//       range: { sheetId: sheetIdMap[title], startRowIndex:0, endRowIndex:1 },
+//       cell: { userEnteredFormat: { backgroundColor:{ red:1,green:0.95,blue:0.75 }, textFormat:{ bold:true } } },
+//       fields: 'userEnteredFormat(backgroundColor,textFormat)'
+//     }
+//   }));
+//   await sheets.spreadsheets.batchUpdate({ spreadsheetId, requestBody:{ requests } });
+
+//   return spreadsheetId;
+//}
+
 
 
 export interface ParsedCampaign {
@@ -134,6 +152,30 @@ export async function writeStatusToSheet(oAuthClient: OAuth2Client, sheetId: str
     valueInputOption: 'RAW',
     requestBody: {
       values: statuses.map(status => [status])
+    }
+  });
+}
+
+/**
+ * Ændrer kun arktitlen (spreadsheet title) i Google Sheets
+ */
+export async function updateGoogleSheetTitle(
+  oAuthClient: OAuth2Client,
+  spreadsheetId: string,
+  newTitle: string
+): Promise<void> {
+  const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
+  await sheets.spreadsheets.batchUpdate({
+    // spreadsheetId kommer her
+    spreadsheetId,
+    requestBody: {
+      requests: [{
+        updateSpreadsheetProperties: {
+          // properties må kun indeholde felter fra SpreadsheetProperties
+          properties: { title: newTitle },
+          fields: 'title'
+        }
+      }]
     }
   });
 }
