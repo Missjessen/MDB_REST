@@ -2,7 +2,8 @@
 import { Schema, model } from "mongoose";
 import { ISheet } from '../interfaces/iSheet';
 
-export interface SheetDocument extends ISheet, Document {}
+
+export interface SheetDocument extends Document, Omit<ISheet,'_id'> {}
 
 const SheetSchema = new Schema<SheetDocument>({
   userId:    { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },

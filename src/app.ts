@@ -17,6 +17,7 @@ import { generalLimiter } from './middleware/rateLimiter';
 
 
 import dotenv from 'dotenv';
+import campaignDefsRoutes from './routes/campaignDefsRoutes';
 dotenv.config();
 
 
@@ -66,7 +67,7 @@ export function startServer() {
     app.use('/api/sheets', sheetsRoutes);
     //app.use('/api/deploy', deployRoutes);
 
-   
+    router.use('/api', campaignDefsRoutes);
    
 
    
