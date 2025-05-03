@@ -114,35 +114,35 @@ export async function updateAdRowInSheet(
 
 /** Slet én række i Sheet */
 export async function deleteAdRowInSheet(
-  oAuthClient: OAuth2Client,
-  sheetId: string,
-  adId: string
-): Promise<void> {
-  const doc = await AdDefModel.findById(adId).lean();
-  if (!doc?.rowIndex) return;
-  const sheets = google.sheets({ version:'v4', auth: oAuthClient });
-  // find sheetId´en for fanen “Annoncer”
-  const info = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
-  const announcerId = info.data.sheets!
-    .find(s => s.properties!.title === 'Annoncer')!
-    .properties!.sheetId!;
-  await sheets.spreadsheets.batchUpdate({
-    spreadsheetId: sheetId,
-    requestBody: {
-      requests: [{
-        deleteDimension:{
-          range:{
-            sheetId:    announcerId,
-            dimension:  'ROWS',
-            startIndex: doc.rowIndex-1,
-            endIndex:   doc.rowIndex
+    oAuthClient: OAuth2Client,
+    spreadsheetId: string,
+    rowIndex: number
+  ): Promise<void> {
+    const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
+  
+    // Først hent sheetId for fanen “Annoncer”
+    const info = await sheets.spreadsheets.get({ spreadsheetId });
+    const annoncerSheetId = info.data.sheets!
+      .find(s => s.properties!.title === 'Annoncer')!
+      .properties!.sheetId!;
+  
+    // Så slet lige netop den række
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [{
+          deleteDimension: {
+            range: {
+              sheetId:    annoncerSheetId,
+              dimension:  'ROWS',
+              startIndex: rowIndex - 1, // zero-based
+              endIndex:   rowIndex
+            }
           }
-        }
-      }]
-    }
-  });
-}
-
+        }]
+      }
+    });
+  }
 
 // /* export interface ParsedAd {
 //     adGroup:    string;

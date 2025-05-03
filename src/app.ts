@@ -73,12 +73,11 @@ export function startServer() {
     //app.use('/api/deploy', deployRoutes);
 
     app.use('/api/campaign-defs', campaignDefsRoutes);
-    app.use('/ads', adRoutes);
+    app.use('/api/ad-defs', adRoutes);
     app.use('/api/keyword-defs', keywordsRouter);
     //app.use('/api/keyword-defs', keywordRoutes);
 
 
-   
 
     // Swagger documentation
     setupSwagger(app);

@@ -6,6 +6,7 @@ import { IAdDef } from '../interfaces/IAdDef';
 // så Document kun kommer med den én gang.
 export interface AdDefDoc extends Omit<IAdDef,'_id'>, Document {}
 
+
 const AdDefSchema = new Schema<AdDefDoc>(
   {
     userId:      { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },

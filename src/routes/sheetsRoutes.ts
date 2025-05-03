@@ -2,6 +2,7 @@ import express from 'express';
 import { requireAuth } from '../middleware/requireAuth';
 //import { syncSheetHandler } from '../controllers/syncSheetController';
 import * as ctrl from '../controllers/sheetsController';
+import { syncAllFromSheet } from '../services/sheetService';
 
 
 
@@ -40,9 +41,9 @@ sheetsRouter.delete('/:sheetId', ctrl.deleteSheet);
 // POST /api/sheets/:sheetId/sync
 //sheetsRouter.post('/:sheetId/sync', ctrl.syncSheet);
 
-// ─── CRUD for Sheets ────────────────────────────────────────────────────────
+// ─── CRUD all ────────────────────────────────────────────────────────
 
-// Kampagner
+sheetsRouter.post ('/:sheetId/sync-db-all', ctrl.syncAllFromSheet);
 
 
 // Annoncer

@@ -10,6 +10,6 @@ adRouter.use(requireAuth);
 adRouter.get('/:sheetId', ctrl.getAdsForSheet);
 adRouter.put('/:sheetId/:adId', ctrl.updateAd);
 adRouter.delete('/:sheetId/:adId', ctrl.deleteAd);
-adRouter.post('/:sheetId/sync' , ctrl.syncAds);
+adRouter.post('/:sheetId/sync-db' , ctrl.syncAds);
 
 export default adRouter;
