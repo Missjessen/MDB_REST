@@ -2,7 +2,7 @@
 // services/adsService.ts
 // ================================
 import fetch from 'node-fetch';
-import { Types } from 'mongoose';
+//import { Types } from 'mongoose';
 
 const GOOGLE_ADS_BASE = 'https://googleads.googleapis.com/v14';
 const CUSTOMER_ID = process.env.GOOGLE_ADS_CUSTOMER_ID;

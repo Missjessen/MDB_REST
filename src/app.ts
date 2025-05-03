@@ -8,6 +8,9 @@ import { setupSwagger } from "./util/documentationSwag";
 import authRoutes from './routes/authRoutes';
 
 import sheetsRoutes from './routes/sheetsRoutes';
+import adRoutes from './routes/adRoutes';
+
+
 //import deployRoutes from './routes/deployRoutes';
 
 import { generalLimiter } from './middleware/rateLimiter';
@@ -17,6 +20,8 @@ import { generalLimiter } from './middleware/rateLimiter';
 
 
 import dotenv from 'dotenv';
+import campaignRouter from './routes/campaignDefsRoutes';
+import keywordsRouter from './routes/keywordRoutes';
 import campaignDefsRoutes from './routes/campaignDefsRoutes';
 dotenv.config();
 
@@ -67,8 +72,11 @@ export function startServer() {
     app.use('/api/sheets', sheetsRoutes);
     //app.use('/api/deploy', deployRoutes);
 
-    router.use('/api', campaignDefsRoutes);
-   
+    app.use('/api/campaign-defs', campaignDefsRoutes);
+    app.use('/ads', adRoutes);
+    app.use('/api/keyword-defs', keywordsRouter);
+    //app.use('/api/keyword-defs', keywordRoutes);
+
 
    
 

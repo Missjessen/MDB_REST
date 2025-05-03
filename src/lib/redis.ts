@@ -1,8 +1,8 @@
-/* import Redis from 'ioredis';
+// // src/lib/redis.ts
+// import IORedis from 'ioredis';
 
-if (!process.env.REDIS_URL) {
-  throw new Error('REDIS_URL mangler i .env');
-}
-
-export const redis = new Redis(process.env.REDIS_URL);
- */
+// export const redis = new IORedis({
+//   host: process.env.REDIS_HOST  || '127.0.0.1',
+//   port: Number(process.env.REDIS_PORT) || 6379,
+//   password: process.env.REDIS_PASSWORD,   // hvis du har sat et password
+// });

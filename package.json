@@ -37,7 +37,7 @@
     "@types/mongodb": "^4.0.6",
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
-    "bullmq": "^5.51.1",
+    "bullmq": "^5.52.1",
     "cloudinary": "^2.6.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

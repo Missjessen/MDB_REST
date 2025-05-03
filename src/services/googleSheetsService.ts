@@ -3,6 +3,8 @@ import { OAuth2Client } from 'google-auth-library';
 import { getGoogleAccessToken } from './googleAuthService';
 import { IKeywordDef } from '../interfaces/iKeywordDef';
 import { IAdDef } from '../interfaces/iAdDef';
+import { connect, disconnect } from '../repository/database';
+import { KeywordDefModel } from '../models/KeywordDefModel';
 
 
 
@@ -160,19 +162,19 @@ export async function parseAdsFromSheet(
   }));
 }
 
-export async function parseKeywordsFromSheet(
-  oAuthClient: OAuth2Client, sheetId: string
-): Promise<(Omit<IKeywordDef,'_id'|'userId'|'sheetId'> & { rowIndex: number })[]> {
-  const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: sheetId, range: 'Keywords!A2:D'
-  });
-  const rows = res.data.values || [];
-  return rows.map((r,i) => ({
-    adGroup: r[0], keyword: r[1], matchType: r[2] as any,
-    cpc: r[3]?Number(r[3]):undefined, rowIndex: i+2
-  }));
-}
+// export async function parseKeywordsFromSheet(
+//   oAuthClient: OAuth2Client, sheetId: string
+// ): Promise<(Omit<IKeywordDef,'_id'|'userId'|'sheetId'> & { rowIndex: number })[]> {
+//   const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
+//   const res = await sheets.spreadsheets.values.get({
+//     spreadsheetId: sheetId, range: 'Keywords!A2:D'
+//   });
+//   const rows = res.data.values || [];
+//   return rows.map((r,i) => ({
+//     adGroup: r[0], keyword: r[1], matchType: r[2] as any,
+//     cpc: r[3]?Number(r[3]):undefined, rowIndex: i+2
+//   }));
+// }
 
 export async function writeStatusToSheet(oAuthClient: OAuth2Client, sheetId: string, statuses: string[]) {
   const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
@@ -209,4 +211,64 @@ export async function updateGoogleSheetTitle(
       }]
     }
   });
+}
+
+export interface ParsedKeyword {
+  adGroup: string;
+  keyword: string;
+  matchType: 'BROAD' | 'PHRASE' | 'EXACT';
+  cpc?: number;
+  rowIndex: number;
+}
+
+/**
+ * Læs alle keywords fra fanen 'Keywords' og returnér med række-index.
+ */
+export async function parseKeywordsFromSheet(
+  oAuthClient: OAuth2Client,
+  sheetId: string
+): Promise<ParsedKeyword[]> {
+  const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: 'Keywords!A2:D'
+  });
+  const rows = res.data.values || [];
+  return rows
+    .map((r, i) => ({
+      adGroup:   r[0] as string,
+      keyword:   r[1] as string,
+      matchType: (r[2] as string).toUpperCase() as any,
+      cpc:       r[3] ? Number(r[3]) : undefined,
+      rowIndex:  i + 2
+    }))
+    .filter(k => k.adGroup && k.keyword);
+}
+
+/**
+ * Sync: slet gamle defs for sheet+user, indsæt nye batch-insert.
+ */
+export async function syncKeywordDefsFromSheet(
+  oAuthClient: OAuth2Client,
+  sheetId: string,
+  userId: string
+): Promise<ParsedKeyword[]> {
+  const parsed = await parseKeywordsFromSheet(oAuthClient, sheetId);
+  await connect();
+  try {
+    await KeywordDefModel.deleteMany({ sheetId, userId });
+    const docs = parsed.map(k => ({
+      userId,
+      sheetId,
+      adGroup: k.adGroup,
+      keyword: k.keyword,
+      matchType: k.matchType,
+      cpc: k.cpc,
+      rowIndex: k.rowIndex
+    }));
+    await KeywordDefModel.insertMany(docs);
+  } finally {
+    await disconnect();
+  }
+  return parsed;
 }

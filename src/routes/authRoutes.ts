@@ -5,6 +5,7 @@ import { loginLimiter } from '../middleware/rateLimiter';
 
 const authRouter = express.Router();
 
+
 authRouter.get('/google', loginLimiter, googleLogin);
 authRouter.get('/google/callback', googleCallback);
 authRouter.get('/me', requireAuth, getMe);

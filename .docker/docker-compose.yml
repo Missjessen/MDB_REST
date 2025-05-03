@@ -1,0 +1,67 @@
+# version: '3.8'
+
+# services:
+#   mongo:
+#     image: mongo:6
+#     restart: unless-stopped
+#     environment:
+#       MONGO_INITDB_ROOT_USERNAME: root
+#       MONGO_INITDB_ROOT_PASSWORD: password
+#       MONGO_INITDB_DATABASE: mydb              # Det navn, du sætter på din database
+#     ports:
+#       - "27017:27017"
+#     volumes:
+#       - mongo-data:/data/db
+
+#   api:
+#     build: .
+#     restart: unless-stopped
+#     ports:
+#       - "4000:4000"
+#     depends_on:
+#       - mongo
+#     environment:
+#       # Du kan også bruge env_file: - .env, hvis du foretrækker at samle dem i en .env-fil
+#       DBHOST: mongodb://root:password@mongo:27017/mydb?authMechanism=DEFAULT
+#       PORT: 4000
+#       JWT_SECRET: ${JWT_SECRET}
+#       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+#       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+#       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+#       # … resten af dine miljø‐variabler …
+#     volumes:
+#       - .:/usr/src/app
+#       - /usr/src/app/node_modules
+
+# volumes:
+#   mongo-data:
+
+# # version: '3.8'
+# # services:
+# #   api:
+# #     build: . 
+# #     command: yarn start:api     # din Express-server
+# #     env_file: .env
+# #     ports: ["4000:4000"]
+# #     depends_on: ["mongo","redis"]
+
+# #   worker:
+# #     build: .
+# #     command: yarn start:worker  # din BullMQ-worker
+# #     env_file: .env
+# #     depends_on: ["mongo","redis"]
+
+# #   mongo:
+# #     image: mongo:6.0
+# #     container_name: my-mongo
+# #     ports: ["27017:27017"]
+
+# #   redis:
+# #     image: redis:7.2-alpine
+# #     container_name: my-redis
+# #     command: ["redis-server","--requirepass","${REDIS_PASSWORD}"]
+# #     ports: ["6379:6379"]
+
+# # .env skal indeholde bl.a.:
+# #  REDIS_PASSWORD=dit_meget_sikre_password
+# #  MONGO_URL=mongodb://mongo:27017/dinDB

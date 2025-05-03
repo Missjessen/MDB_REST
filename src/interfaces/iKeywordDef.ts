@@ -3,12 +3,14 @@
 import { Types } from 'mongoose';
 
 export interface IKeywordDef {
-  // fjern: _id?: Types.ObjectId;
-  userId:    Types.ObjectId;
-  sheetId:   string;
-  adGroup:   string;
-  keyword:   string;
-  matchType: 'BROAD' | 'PHRASE' | 'EXACT';
-  cpc?:      number;
-  createdAt?: Date;
-}
+        _id?: Types.ObjectId;
+        userId: Types.ObjectId;
+        sheetId: string;      // Google Sheets ID
+        adGroup: string;      // Ad-group navn
+        keyword: string;
+        matchType: 'BROAD' | 'PHRASE' | 'EXACT';
+        cpc?: number;
+        rowIndex?: number;    // hvis du vil tracke række til two-way sync
+        createdAt?: Date;
+      }
+  

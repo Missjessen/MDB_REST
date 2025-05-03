@@ -3,13 +3,16 @@ import express from 'express';
 import { requireAuth } from '../middleware/requireAuth';
 import * as ctrl from '../controllers/campaignDefsController';
 
-const campaignDefsRoutes = express.Router();
+const campaignRouter = express.Router();
 
 // alle ruter er beskyttet
-campaignDefsRoutes.use(requireAuth);
+campaignRouter.use(requireAuth);
 
-campaignDefsRoutes.get   ('/campaign-defs/:sheetId',             ctrl.getCampaignsForSheet);
-campaignDefsRoutes.put   ('/campaign-defs/:sheetId/:campaignId', ctrl.updateCampaign);
-campaignDefsRoutes.delete('/campaign-defs/:sheetId/:campaignId', ctrl.deleteCampaign);
+campaignRouter.get   ('/:sheetId',             ctrl.getCampaignsForSheet);
+campaignRouter.put   ('/:sheetId/:campaignId', ctrl.updateCampaign);
+campaignRouter.delete('/:sheetId/:campaignId', ctrl.deleteCampaign);
+campaignRouter.post('/:sheetId/sync-db', ctrl.syncCampaignDefs);
 
-export default campaignDefsRoutes;
+
+
+export default campaignRouter;
