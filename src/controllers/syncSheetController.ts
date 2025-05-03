@@ -1,30 +1,98 @@
-/* // controllers/syncSheetController.ts – opdateret til ikke at lukke DB-session midt i kørsel
-import { Request, Response } from 'express';
-import { syncSheetToAds } from '../services/syncSheetToAds';
-import { createOAuthClient } from '../services/googleAuthService';
-import { connect } from '../repository/database';
+// src/controllers/sheetsController.ts
+
+import { Request, Response, NextFunction } from 'express';
+import { connect, disconnect } from '../repository/database';
+
 import { AuthenticatedRequest } from '../interfaces/userReq';
+import { createOAuthClient } from '../services/googleAuthService';
+import {
+  syncCampaignDefsFromSheet
+} from '../services/campaignDefsService';
+import {
+  syncAdDefsFromSheet
+} from '../services/adDefsService';
+import {
+  syncKeywordDefsFromSheet
+} from '../services/keywordDefsService';
 
-export async function syncSheetHandler(req: AuthenticatedRequest, res: Response) {
-  try {
-    // Sikr at vi er forbundet til MongoDB
-    await connect();
+import { syncAllFromSheet } from '../services/syncSheetToAds';
+import { syncSheetToAds }   from '../services/syncSheetToAds';
 
-    const userId = req.params.userId;
+// src/services/sheetSyncService.ts
+import { OAuth2Client } from 'google-auth-library';
+
+
+
+
+export const syncDbController = 
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    // 1) Tjek authentication
     if (!req.user?.refreshToken) {
-      throw new Error('Bruger har ikke refreshToken i JWT');
+      res.status(401).json({ error: 'Login kræves' });
+      return;
     }
 
-    // Opret OAuth2-client og sæt refresh token
-    const refreshToken = req.user!.refreshToken;
-    const oAuthClient = createOAuthClient();
-    oAuthClient.setCredentials({ refresh_token: refreshToken });
+    const { sheetId } = req.params;
+    const oauth       = createOAuthClient();
+    oauth.setCredentials({ refresh_token: req.user.refreshToken });
 
-    // Kør sync-logic
-    const result = await syncSheetToAds(oAuthClient, userId);
-    res.status(200).json({ status: 'OK', result });
-  } catch (error: any) {
-    console.error('❌ Fejl i syncSheetHandler:', error);
-    res.status(500).json({ error: error.message || 'Ukendt fejl' });
-  }
-} */
+    try {
+      await connect();
+      const result = await syncAllFromSheet(oauth, sheetId, req.user._id.toString());
+      res.status(200).json(result);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    } finally {
+      await disconnect();
+    }
+};
+
+export const syncAdsController = 
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    if (!req.user?.refreshToken) {
+      res.status(401).json({ error: 'Login kræves' });
+      return;
+    }
+
+    const { sheetId } = req.params;
+    const oauth       = createOAuthClient();
+    oauth.setCredentials({ refresh_token: req.user.refreshToken });
+
+    try {
+      await connect();
+      const statuses = await syncSheetToAds(oauth, sheetId, req.user._id.toString());
+      res.status(200).json({ statuses });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    } finally {
+      await disconnect();
+    }
+};
+
+export const syncAllAndAdsController = 
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    if (!req.user?.refreshToken) {
+      res.status(401).json({ error: 'Login kræves' });
+      return;
+    }
+
+    const { sheetId } = req.params;
+    const oauth       = createOAuthClient();
+    oauth.setCredentials({ refresh_token: req.user.refreshToken });
+
+    try {
+      await connect();
+      const dbResult    = await syncAllFromSheet(oauth, sheetId, req.user._id.toString());
+      const adsStatuses = await syncSheetToAds(oauth, sheetId, req.user._id.toString());
+      res.status(200).json({
+        campaignsSynced: dbResult.campaigns,
+        adsSynced:      dbResult.ads,
+        keywordsSynced: dbResult.keywords,
+        adsStatuses,
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    } finally {
+      await disconnect();
+    }
+};

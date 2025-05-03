@@ -5,87 +5,66 @@ import { KeywordDefModel } from '../models/KeywordDefModel';
 //import { parseKeywordsFromSheet } from './googleSheetsService';
 import type { IKeywordDef } from '../interfaces/iKeywordDef';
 
+
+
 // src/services/googleSheets/keywordSheetService.ts
 import { google } from 'googleapis';
 
 
 // 1) parseKeywordsFromSheet – læs Keywords!A2:D, returnér også rowIndex
-export interface ParsedKeyword {
-    adGroup: string;
-    keyword: string;
-    matchType: 'BROAD'|'PHRASE'|'EXACT';
-    cpc?: number;
-    rowIndex: number;
-  }
-  
-  export async function parseKeywordsFromSheet(
-    oAuthClient: OAuth2Client,
-    sheetId: string
-  ): Promise<ParsedKeyword[]> {
-    const sheets = google.sheets({ version:'v4', auth: oAuthClient });
-    const res    = await sheets.spreadsheets.values.get({
-      spreadsheetId: sheetId,
-      range: 'Keywords!A2:D'
-    });
-    const rows = res.data.values || [];
-  
-    return rows
-      .map((r, i) => {
-        // r[3] kan være '', undefined eller en tekst der ikke er et tal
-        const rawCpc = r[3];
-        let cpc: number | undefined;
-        if (rawCpc != null && rawCpc !== '') {
-          const parsed = Number(rawCpc);
-          if (!Number.isNaN(parsed)) cpc = parsed;
-        }
-  
-        return {
-          adGroup:   String(r[0] ?? ''),
-          keyword:   String(r[1] ?? ''),
-          matchType: (String(r[2] ?? '') as 'BROAD'|'PHRASE'|'EXACT'),
-          cpc,
-          rowIndex:  i + 2
-        };
-      })
-      .filter(k => k.adGroup && k.keyword);
-  }
+interface ParsedKeyword {
+  adGroup:   string;
+  keyword:   string;
+  matchType: 'BROAD'|'PHRASE'|'EXACT';
+  cpc?:      number;
+  rowIndex:  number;
+}
 
-// 2) syncKeywordDefsFromSheet – slet gamle, indsæt nye inkl. rowIndex
+export async function parseKeywordsFromSheet(
+  oAuthClient: OAuth2Client,
+  sheetId: string
+): Promise<ParsedKeyword[]> {
+  const sheets = google.sheets({ version:'v4', auth: oAuthClient });
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: 'Keywords!A2:D'
+  });
+  const rows = res.data.values || [];
+  return rows
+    .map((r,i) => ({
+      adGroup:  r[0] as string,
+      keyword:  r[1] as string,
+      matchType: (r[2] as string).toUpperCase() as ParsedKeyword['matchType'],
+      cpc:      r[3] ? Number(r[3]) : undefined,
+      rowIndex: i+2
+    }))
+    .filter(k => k.adGroup && k.keyword);
+}
+
 export async function syncKeywordDefsFromSheet(
-    oAuthClient: OAuth2Client,
-    sheetId: string,
-    userId: string
-  ): Promise<ParsedKeyword[]> {
-    const parsed = await parseKeywordsFromSheet(oAuthClient, sheetId);
-  
-    await connect();
-    try {
-      await KeywordDefModel.deleteMany({ sheetId, userId });
-  
-      const docs = parsed.map(k => {
-        const doc: any = {
-          userId,
-          sheetId,
-          adGroup: k.adGroup,
-          keyword: k.keyword,
-          matchType: k.matchType,
-          rowIndex: k.rowIndex,
-          createdAt: new Date()
-        };
-        // kun tilføj cpc hvis det ikke er undefined
-        if (typeof k.cpc === 'number') {
-          doc.cpc = k.cpc;
-        }
-        return doc;
-      });
-  
-      await KeywordDefModel.insertMany(docs);
-    } finally {
-      await disconnect();
-    }
-  
-    return parsed;
+  oAuthClient: OAuth2Client,
+  sheetId: string,
+  userId: string
+): Promise<ParsedKeyword[]> {
+  const parsed = await parseKeywordsFromSheet(oAuthClient, sheetId);
+  await connect();
+  try {
+    await KeywordDefModel.deleteMany({ sheetId, userId });
+    await KeywordDefModel.insertMany(parsed.map(k => ({
+      userId,
+      sheetId,
+      adGroup:  k.adGroup,
+      keyword:  k.keyword,
+      matchType:k.matchType,
+      cpc:      k.cpc,
+      rowIndex: k.rowIndex,
+      createdAt: new Date()
+    })));
+  } finally {
+    await disconnect();
   }
+  return parsed;
+}
 
 // 3) updateKeywordRowInSheet – skriv enkelt-celle opdateringer
 export async function updateKeywordRowInSheet(

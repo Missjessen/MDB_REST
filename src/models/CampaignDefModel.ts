@@ -19,6 +19,6 @@ const CampaignDefSchema = new Schema<CampaignDefDoc>({
   versionKey: false
 });
 
-CampaignDefSchema.index({ sheetId:1, campaignId:1 }, { unique: true });
+//CampaignDefSchema.index({ sheetId:1, campaignId:1 }, { unique: true });
 
 export const CampaignDefModel = model<CampaignDefDoc>('CampaignDef', CampaignDefSchema);

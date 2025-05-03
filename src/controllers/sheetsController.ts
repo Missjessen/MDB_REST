@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import { RequestHandler, NextFunction } from 'express';
 import { Types } from 'mongoose';
 import { connect, disconnect } from '../repository/database';
 import { SheetModel } from '../models/SheetModel';
@@ -7,6 +7,7 @@ import { createOAuthClient } from '../services/googleAuthService';
 //import { syncSheetToAds } from '../services/syncSheetToAds';
 import { AuthenticatedRequest } from '../interfaces/userReq';
 import { google } from 'googleapis';
+//import { syncAllFromSheet } from '../services/sheetService';
 
 // ░▒▓██ get, post, put, delete (CRUD)██▓▒░
 /**
@@ -229,7 +230,29 @@ export const deleteSheet: RequestHandler = async (req, res): Promise<void> => {
 };
 
 
+// export const syncAllSheets = 
+//   async (
+//     req: AuthenticatedRequest, 
+//     res: Response, 
+//     next: NextFunction
+//   ): Promise<void> => {
+//     try {
+//       await connect();
+//       const oAuthClient = await createOAuthClient(req.user);
+//       const sheetId = req.params.sheetId;
+//       const userId  = req.user.id;
+//       const result  = await syncAllFromSheet(oAuthClient, sheetId, userId);
+//       await disconnect();
 
+//       // Kald res.json OG returnér derefter tomt:
+//       res.status(200).json(result);
+//       return;         // ← sikrer at funktionen slutter med void
+//     } catch (err) {
+//       await disconnect();
+//       next(err);
+//       return;         // ← også void
+//     }
+//   };
 
 
 

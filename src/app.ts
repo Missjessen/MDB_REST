@@ -9,6 +9,7 @@ import authRoutes from './routes/authRoutes';
 
 import sheetsRoutes from './routes/sheetsRoutes';
 import adRoutes from './routes/adRoutes';
+import syncRouter from './routes/syncRoutes';
 
 
 //import deployRoutes from './routes/deployRoutes';
@@ -75,7 +76,8 @@ export function startServer() {
     app.use('/api/campaign-defs', campaignDefsRoutes);
     app.use('/api/ad-defs', adRoutes);
     app.use('/api/keyword-defs', keywordsRouter);
-    //app.use('/api/keyword-defs', keywordRoutes);
+
+    app.use('/api/sheets', syncRouter);
 
 
 

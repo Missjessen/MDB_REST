@@ -2,7 +2,10 @@ import express from 'express';
 import { requireAuth } from '../middleware/requireAuth';
 //import { syncSheetHandler } from '../controllers/syncSheetController';
 import * as ctrl from '../controllers/sheetsController';
-import { syncAllFromSheet } from '../services/sheetService';
+//import { syncAllFromSheet } from '../services/sheetService';
+
+
+
 
 
 
@@ -43,7 +46,7 @@ sheetsRouter.delete('/:sheetId', ctrl.deleteSheet);
 
 // ─── CRUD all ────────────────────────────────────────────────────────
 
-sheetsRouter.post ('/:sheetId/sync-db-all', ctrl.syncAllFromSheet);
+//sheetsRouter.post ('/:sheetId/sync-db-all', syncAllFromSheet);
 
 
 // Annoncer
