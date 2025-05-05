@@ -49,27 +49,26 @@ export async function syncAdDefsFromSheet(
   userId: string
 ): Promise<ParsedAd[]> {
   const parsed = await parseAdsFromSheet(oAuthClient, sheetId);
-  await connect();
-  try {
-    await AdDefModel.deleteMany({ sheetId, userId });
-    await AdDefModel.insertMany(parsed.map(a => ({
-      userId:     userId,
-      sheetId,
-      adGroup:    a.adGroup,
-      headline1:  a.headline1,
-      headline2:  a.headline2,
-      description:a.description,
-      finalUrl:   a.finalUrl,
-      path1:      a.path1,
-      path2:      a.path2,
-      rowIndex:   a.rowIndex,
-      createdAt:  new Date()
-    })));
-  } finally {
-    await disconnect();
-  }
+
+  await AdDefModel.deleteMany({ sheetId, userId });
+  await AdDefModel.insertMany(parsed.map(a => ({
+    userId,
+    sheetId,
+    adGroup:     a.adGroup,
+    headline1:   a.headline1,
+    headline2:   a.headline2,
+    description: a.description,
+    finalUrl:    a.finalUrl,
+    path1:       a.path1,
+    path2:       a.path2,
+    rowIndex:    a.rowIndex,
+    createdAt:   new Date()
+  })));
+
   return parsed;
 }
+
+
 
 /** Opdater én række i Sheet efter DB-opdatering */
 export async function updateAdRowInSheet(

@@ -37,14 +37,12 @@ export const syncDbController =
     oauth.setCredentials({ refresh_token: req.user.refreshToken });
 
     try {
-      await connect();
+      //await connect();
       const result = await syncAllFromSheet(oauth, sheetId, req.user._id.toString());
       res.status(200).json(result);
     } catch (err: any) {
       res.status(500).json({ error: err.message });
-    } finally {
-      await disconnect();
-    }
+    } 
 };
 
 export const syncAdsController = 
@@ -59,14 +57,12 @@ export const syncAdsController =
     oauth.setCredentials({ refresh_token: req.user.refreshToken });
 
     try {
-      await connect();
+      //await connect();
       const statuses = await syncSheetToAds(oauth, sheetId, req.user._id.toString());
       res.status(200).json({ statuses });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
-    } finally {
-      await disconnect();
-    }
+    } 
 };
 
 export const syncAllAndAdsController = 
@@ -81,7 +77,7 @@ export const syncAllAndAdsController =
     oauth.setCredentials({ refresh_token: req.user.refreshToken });
 
     try {
-      await connect();
+      //await connect();
       const dbResult    = await syncAllFromSheet(oauth, sheetId, req.user._id.toString());
       const adsStatuses = await syncSheetToAds(oauth, sheetId, req.user._id.toString());
       res.status(200).json({
@@ -92,7 +88,5 @@ export const syncAllAndAdsController =
       });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
-    } finally {
-      await disconnect();
-    }
+    } 
 };

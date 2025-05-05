@@ -33,7 +33,7 @@ export const createGoogleAdsTestAccount = async (req: Request, res: Response): P
     }
   
     try {
-      await connect();
+      //await connect();
       const updatedUser = await iUserModel.findByIdAndUpdate(
         userId,
         { googleAdsCustomerId },
@@ -48,15 +48,16 @@ export const createGoogleAdsTestAccount = async (req: Request, res: Response): P
       res.status(200).json({ message: 'Google Ads ID tilføjet', updatedUser });
     } catch (error) {
       res.status(500).json({ error: 'Fejl ved opdatering af Ads ID: ' + error });
-    } finally {
-      await disconnect();
-    }
+    } 
+    //finally {
+      //await disconnect();
+    //}
   };
   
 
   export const getCustomerList = async (req: Request, res: Response): Promise<void> => {
     try {
-      await connect();
+      //await connect();
       const customers = await iUserModel.find({}, 'email googleAdsCustomerId');
   
       if (!customers || customers.length === 0) {
@@ -67,9 +68,9 @@ export const createGoogleAdsTestAccount = async (req: Request, res: Response): P
       res.status(200).json(customers);
     } catch (error) {
       res.status(500).json({ error: "Fejl ved hentning af kunder: " + error });
-    } finally {
-      await disconnect();
-    }
+    } //finally {
+      //await disconnect();
+    //}
   };
   
 

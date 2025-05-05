@@ -34,23 +34,33 @@ export async function parseCampaignsFromSheet(oauth:OAuth2Client, sheetId:string
     .filter(c=>c.name&&c.status&&c.startDate&&c.endDate);
 }
 
-export async function syncCampaignDefsFromSheet(oauth:OAuth2Client, sheetId:string, userId:string):Promise<ParsedCampaign[]>{
-  const parsed = await parseCampaignsFromSheet(oauth,sheetId);
-  await connect();
-  try {
-    await CampaignDefModel.deleteMany({sheetId,userId});
-    await CampaignDefModel.insertMany(parsed.map(c=>({
-      userId:new Types.ObjectId(userId), sheetId,
-      campaignId:String(c.rowIndex),
-      name:c.name, status:c.status, budget:c.budget!,
-      startDate:c.startDate, endDate:c.endDate,
-      rowIndex:c.rowIndex, createdAt:new Date()
-    } as Omit<ICampaignDef,'_id'>)));
-  } finally {
-    await disconnect();
-  }
+export async function syncCampaignDefsFromSheet(
+  oauth: OAuth2Client,
+  sheetId: string,
+  userId: string
+): Promise<ParsedCampaign[]> {
+  const parsed = await parseCampaignsFromSheet(oauth, sheetId);
+
+  // Opdater DB uden at lukke forbindelsen
+  await CampaignDefModel.deleteMany({ sheetId, userId });
+  await CampaignDefModel.insertMany(
+    parsed.map(c => ({
+      userId:     new Types.ObjectId(userId),
+      sheetId,
+      campaignId: String(c.rowIndex),
+      name:       c.name,
+      status:     c.status,
+      budget:     c.budget!,
+      startDate:  c.startDate,
+      endDate:    c.endDate,
+      rowIndex:   c.rowIndex,
+      createdAt:  new Date()
+    } as Omit<ICampaignDef, '_id'>))
+  );
+
   return parsed;
 }
+
   
   /**
    * Opdater én celle-per-kolonne i rækken i arket.

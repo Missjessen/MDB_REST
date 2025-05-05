@@ -29,7 +29,7 @@ export const googleCallback: RequestHandler = async (req, res) => {
 
   try {
     // Sørg for DB‐forbindelse
-    await connect();
+    //await connect();
 
     // Håndter code → tokens + opret/oppdatér iUserModel
     const { user, tokens } = await verifyGoogleCode(code);
@@ -59,9 +59,9 @@ export const googleCallback: RequestHandler = async (req, res) => {
   } catch (err: any) {
     console.error('❌ Fejl under OAuth callback:', err);
     res.status(500).json({ error: 'Fejl under login‑processen' });
-  } finally {
-    await disconnect();
-  }
+  } //finally {
+    //await disconnect();
+  //}
 };
 
 /**

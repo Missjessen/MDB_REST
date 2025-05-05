@@ -14,15 +14,16 @@ import { IAdDef } from '../interfaces/iAdDef';
 export const getAdsForSheet: RequestHandler = async (req, res) => {
   const user = (req as AuthenticatedRequest).user!;
   const { sheetId } = req.params;
-  await connect();
+  //await connect();
   try {
     const docs = await AdDefModel.find({ sheetId, userId: user._id }).lean<IAdDef>().exec();
     res.json(docs);
   } catch (e:any) {
     res.status(500).json({ error: e.message });
-  } finally {
-    await disconnect();
-  }
+  } 
+  //finally {
+    //await disconnect();
+  //}
 };
 
 /** PUT /api/ad-defs/:sheetId/:adId */
@@ -30,7 +31,7 @@ export const updateAd: RequestHandler = async (req, res) => {
   const user = (req as AuthenticatedRequest).user!;
   const { sheetId, adId } = req.params;
   const updates = req.body;
-  await connect();
+  //await connect();
   try {
     const doc = await AdDefModel.findOneAndUpdate(
       { _id: adId, sheetId, userId: user._id },
@@ -50,9 +51,10 @@ export const updateAd: RequestHandler = async (req, res) => {
     res.json(doc);
   } catch(e:any) {
     res.status(500).json({ error: e.message });
-  } finally {
-    await disconnect();
-  }
+  } 
+  //inally {
+    //await disconnect();
+  //}
 };
 
 /** DELETE /api/ad-defs/:sheetId/:adId */
@@ -67,7 +69,7 @@ export const deleteAd: RequestHandler = async (req, res) => {
     }
   
     // 2) Hent dokument og rowIndex
-    await connect();
+    //await connect();
     try {
       const ad = await AdDefModel
         .findOne({ _id: adId, sheetId, userId: user._id })
@@ -102,10 +104,11 @@ export const deleteAd: RequestHandler = async (req, res) => {
     } catch (err: any) {
       res.status(500).json({ error: err.message });
       return;
-    } finally {
+    } 
+    //finally {
       // 6) Luk DB-forbindelse uanset hvad
-      await disconnect();
-    }
+      //await disconnect();
+    //}
   };
   
 /** POST /api/ad-defs/:sheetId/sync-db */

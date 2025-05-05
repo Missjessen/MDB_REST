@@ -30,7 +30,7 @@ export async function registerUser(req: Request, res: Response) {
             return;
         }
 
-        await connect();
+       // await connect();
 
         // check if the email is already registered
         const emailExists = await userModel.findOne({ email: req.body.email });
@@ -60,9 +60,9 @@ export async function registerUser(req: Request, res: Response) {
     } catch (error) {
         res.status(500).send({ error: `Error registrering user. Error`});
     }
-    finally {
-        await disconnect();
-    }
+    // finally {
+    //    // await disconnect();
+    // }
 };
 
 // ======================== LOGIN USER ========================
@@ -84,7 +84,7 @@ export async function loginUser(req: Request, res: Response) {
         }
 
         // find the user
-        await connect();
+        //await connect();
         const user: User | null = await userModel.findOne({ email: req.body.email });
         if (!user) {
             res.status(400).json({ error: "Email or password is incorrect" });
@@ -116,9 +116,10 @@ export async function loginUser(req: Request, res: Response) {
 
     } catch (error) {
         res.status(500).send({ error: "Error logging in user." });
-    } finally {
-        await disconnect();
     }
+    //  finally {
+    //     await disconnect();
+     
 }
 /**
  * Validate user info (name, email, password)

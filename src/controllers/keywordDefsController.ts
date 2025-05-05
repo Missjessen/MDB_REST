@@ -21,7 +21,7 @@ export const getKeywordsForSheet: RequestHandler = async (req, res) => {
     return;
   }
 
-  await connect();
+  //await connect();
   try {
     const docs = await KeywordDefModel
       .find({ sheetId, userId: user._id })
@@ -32,9 +32,9 @@ export const getKeywordsForSheet: RequestHandler = async (req, res) => {
   } catch (err: any) {
     res.status(500).json({ error: err.message });
     return;
-  } finally {
-    await disconnect();
-  }
+  } //finally {
+    //await disconnect();
+  //}
 };
 
 // PUT /api/keyword-defs/:sheetId/:keywordId
@@ -48,7 +48,7 @@ export const updateKeyword: RequestHandler = async (req, res) => {
     return;
   }
 
-  await connect();
+  //await connect();
   try {
     const doc = await KeywordDefModel.findOneAndUpdate(
       { _id: keywordId, sheetId, userId: user._id },
@@ -77,9 +77,9 @@ export const updateKeyword: RequestHandler = async (req, res) => {
   } catch (err: any) {
     res.status(500).json({ error: err.message });
     return;
-  } finally {
-    await disconnect();
-  }
+  } //finally {
+   // await disconnect();
+  //}
 };
 
 export const deleteKeyword: RequestHandler = async (req, res): Promise<void> => {
@@ -90,7 +90,7 @@ export const deleteKeyword: RequestHandler = async (req, res): Promise<void> => 
       return;
     }
   
-    await connect();
+    //await connect();
     try {
       // 1) Hent dokumentet inkl. rowIndex
       const doc = await KeywordDefModel
@@ -124,9 +124,9 @@ export const deleteKeyword: RequestHandler = async (req, res): Promise<void> => 
   
     } catch (err: any) {
       res.status(500).json({ error: err.message });
-    } finally {
-      await disconnect();
-    }
+    } //finally {
+      //await disconnect();
+    //}
   };
   
 

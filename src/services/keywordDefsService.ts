@@ -47,24 +47,25 @@ export async function syncKeywordDefsFromSheet(
   userId: string
 ): Promise<ParsedKeyword[]> {
   const parsed = await parseKeywordsFromSheet(oAuthClient, sheetId);
-  await connect();
-  try {
-    await KeywordDefModel.deleteMany({ sheetId, userId });
-    await KeywordDefModel.insertMany(parsed.map(k => ({
+
+  // Opdater DB uden at lukke forbindelsen
+  await KeywordDefModel.deleteMany({ sheetId, userId });
+  await KeywordDefModel.insertMany(
+    parsed.map(k => ({
       userId,
       sheetId,
-      adGroup:  k.adGroup,
-      keyword:  k.keyword,
-      matchType:k.matchType,
-      cpc:      k.cpc,
-      rowIndex: k.rowIndex,
+      adGroup:   k.adGroup,
+      keyword:   k.keyword,
+      matchType: k.matchType,
+      cpc:       k.cpc,
+      rowIndex:  k.rowIndex,
       createdAt: new Date()
-    })));
-  } finally {
-    await disconnect();
-  }
+    }))
+  );
+
   return parsed;
 }
+
 
 // 3) updateKeywordRowInSheet – skriv enkelt-celle opdateringer
 export async function updateKeywordRowInSheet(

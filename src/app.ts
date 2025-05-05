@@ -2,7 +2,7 @@ import cookieParser from 'cookie-parser';
 import express, { Application } from "express";
 import dotenvFlow from "dotenv-flow";
 import cors from "cors";  
-import { testConnection } from "./repository/database";
+import { connect } from "./repository/database";
 import router from "./routes";
 import { setupSwagger } from "./util/documentationSwag";
 import authRoutes from './routes/authRoutes';
@@ -10,6 +10,7 @@ import authRoutes from './routes/authRoutes';
 import sheetsRoutes from './routes/sheetsRoutes';
 import adRoutes from './routes/adRoutes';
 import syncRouter from './routes/syncRoutes';
+
 
 
 //import deployRoutes from './routes/deployRoutes';
@@ -34,33 +35,65 @@ const app: Application = express();
 
 
 // ======================== CORS SETUP ========================
-const allowedOrigins = 
-process.env.ALLOWED_ORIGINS?.split(',') || [];
+// src/app.ts
+
+// 1) Hent ALLOWED_ORIGINS fra .env
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map(o => o.trim())
+  .filter(Boolean);
+
+// 2) Byg server-origin (hvor Swagger UI kører)
+const port = process.env.PORT || 4000;
+const serverOrigin = `http://localhost:${port}`;
+
+// 3) Sørg for at vores server-origin altid er tilladt
+if (!allowedOrigins.includes(serverOrigin)) {
+  allowedOrigins.push(serverOrigin);
+}
+
+// 4) Sæt CORS-middleware op
+app.use(cors({
+  origin(origin, callback) {
+    // tillad Postman (ingen origin header), vores server‐origin og evt. andre fra env
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS‐fejl: Origin ${origin} ikke tilladt`));
+    }
+  },
+  credentials: true,
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization','auth-token']
+}));
+
+
+// const allowedOrigins = 
+// process.env.ALLOWED_ORIGINS?.split(',') || [];
   
-  app.use(cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('CORS-fejl: Origin ikke tilladt'));
-      }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'auth-token']
-  }));
+//   app.use(cors({
+//     origin: function (origin, callback) {
+//       if (!origin || allowedOrigins.includes(origin)) {
+//         callback(null, true);
+//       } else {
+//         callback(new Error('CORS-fejl: Origin ikke tilladt'));
+//       }
+//     },
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type', 'Authorization', 'auth-token']
+//   }));
 
 
 // ======================== MIDDLEWARE SETUP ========================
-
 app.use(generalLimiter); 
 
 app.use(express.json());         
 app.use(express.urlencoded({ extended: true })); 
 
 // ======================== SERVER START ========================
-export function startServer() {
-    testConnection();
+// export function startServer() {
+//     testConnection();
 
     // Handle preflight requests
     app.options("*", cors());
@@ -77,18 +110,12 @@ export function startServer() {
     app.use('/api/ad-defs', adRoutes);
     app.use('/api/keyword-defs', keywordsRouter);
 
-    app.use('/api/sheets', syncRouter);
-
+    app.use('/api/sheets/sync', syncRouter);
+    
 
 
     // Swagger documentation
     setupSwagger(app);
 
-    // Port configuration
-    const PORT: number = parseInt(process.env.PORT as string) || 4000;
-
-    app.listen(PORT, () => console.log(`Server is running on port: ${PORT}`));
-    
-}
-// For testing, export the app instance
-export default app;
+  
+    export default app;

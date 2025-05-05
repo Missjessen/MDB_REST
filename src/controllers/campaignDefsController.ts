@@ -18,7 +18,7 @@ export const getCampaignsForSheet: RequestHandler = async (req, res) => {
     return;
   }
 
-  await connect();
+  //await connect();
   try {
     const docs = await CampaignDefModel
       .find({ sheetId, userId: user._id })
@@ -27,9 +27,10 @@ export const getCampaignsForSheet: RequestHandler = async (req, res) => {
     res.json(docs);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
-  } finally {
-    await disconnect();
-  }
+  } 
+  //finally {
+    //await disconnect();
+  //}
 };
 
 /**
@@ -46,7 +47,7 @@ export const updateCampaign: RequestHandler = async (req, res) => {
     }
   
     // 1) Opdater i Mongo og hent rowIndex
-    await connect();
+    //await connect();
     let doc;
     try {
       doc = await CampaignDefModel.findOneAndUpdate(
@@ -61,9 +62,10 @@ export const updateCampaign: RequestHandler = async (req, res) => {
     } catch (err: any) {
       res.status(500).json({ error: err.message });
       return;
-    } finally {
-      await disconnect();
-    }
+    } 
+    //finally {
+      //await disconnect();
+    //}
   
     // 2) Opdater i Google Sheet på netop den række
     try {
@@ -102,7 +104,7 @@ export const deleteCampaign: RequestHandler = async (req, res) => {
     }
   
     // 1) Hent rowIndex + slet dokument i Mongo
-    await connect();
+    //await connect();
     let rowIndex: number;
     try {
       const doc = await CampaignDefModel.findOne({ _id: campaignId, sheetId, userId: user._id }).lean();
@@ -115,9 +117,10 @@ export const deleteCampaign: RequestHandler = async (req, res) => {
     } catch (err: any) {
       res.status(500).json({ error: err.message });
       return;
-    } finally {
-      await disconnect();
-    }
+    } 
+    //finally {
+      //await disconnect();
+    //}
   
     // 2) Slet rækken i Google Sheet
     try {
@@ -150,7 +153,7 @@ export const syncCampaignDefs: RequestHandler = async (req, res) => {
     const oauth = createOAuthClient();
     oauth.setCredentials({ refresh_token: user.refreshToken });
   
-    await connect();
+    //await connect();
     try {
       const parsed = await syncCampaignDefsFromSheet(
         oauth,
@@ -162,7 +165,8 @@ export const syncCampaignDefs: RequestHandler = async (req, res) => {
     } catch (err: any) {
       res.status(500).json({ error: err.message });
       return;            // <= return void
-    } finally {
-      await disconnect();
-    }
+    } 
+    //finally {
+      //await disconnect();
+    //}
   };
