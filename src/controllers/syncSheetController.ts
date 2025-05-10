@@ -1,6 +1,6 @@
 // src/controllers/sheetsController.ts
 
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 //import { connect, disconnect } from '../repository/database';
 
 import { AuthenticatedRequest } from '../interfaces/userReq';
