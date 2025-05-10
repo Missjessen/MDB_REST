@@ -10,6 +10,7 @@ import authRoutes from './routes/authRoutes';
 import sheetsRoutes from './routes/sheetsRoutes';
 import adRoutes from './routes/adRoutes';
 import syncRouter from './routes/syncRoutes';
+import helmet from 'helmet'
 
 
 
@@ -97,6 +98,36 @@ app.use(express.urlencoded({ extended: true }));
 
     // Handle preflight requests
     app.options("*", cors());
+
+    app.use(
+      helmet({
+        contentSecurityPolicy: {
+          useDefaults: false,   // drop Helmet’s default “default-src 'self'; script-src 'self'” helt
+          directives: {
+            // 1) Helt grundlæggende egen app + egen API-host
+            "default-src": ["'self'"],
+    
+            // 2) Stylings: tillad inline-styles (til f.eks. Tailwind) + Google Fonts CSS
+            "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+    
+            // 3) Fonts: Google Fonts -host + data: (til evt. base64)
+            "font-src":  ["'self'", "https://fonts.gstatic.com", "data:"],
+    
+            // 4) Scripts: egen app + evt. cdn’er
+            "script-src": ["'self'"],
+    
+            // 5) Connect: din frontends og backends origin (hvis du bruger fetch/WS)
+            "connect-src": ["'self'", "http://localhost:4000"],
+    
+            // 6) Billeder o.l.: egen host + data:
+            "img-src": ["'self'", "data:"],
+    
+            // hvis du har iframes, frames, etc. tilføj dem her…
+          }
+        }
+      })
+    )
+    
 
     // Route setup
     app.use(cookieParser()); // 🧠 Dette tilføjer req.cookies

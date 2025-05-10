@@ -8,6 +8,9 @@ const iUserSchema = new Schema<IUser>({
   refreshToken: { type: String, required: true },
   expiryDate:   { type: Date,   required: true },
 
+  name:    { type: String }, 
+  picture: { type: String },
+
   googleAdsCustomerId: { type: String },  // valgfri
   sheetId:             { type: String }   // valgfri
 });

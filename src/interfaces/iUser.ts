@@ -5,6 +5,10 @@
     accessToken: string;
     refreshToken: string;
     expiryDate: Date;
+
+    name: string;
+    picture: string;
+
     googleAdsCustomerId?: string;
     sheetId?: string;
   }

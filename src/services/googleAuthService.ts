@@ -11,6 +11,8 @@ const SCOPES = [
   'https://www.googleapis.com/auth/adwords',
   'https://www.googleapis.com/auth/spreadsheets',
   'https://www.googleapis.com/auth/drive.file',  
+  'https://www.googleapis.com/auth/drive.readonly',
+  'https://www.googleapis.com/auth/drive.readonly',
   'https://www.googleapis.com/auth/userinfo.email',
   'https://www.googleapis.com/auth/userinfo.profile'
 ];
@@ -49,7 +51,7 @@ export async function verifyGoogleCode(code: string) {
   client.setCredentials(tokens);
 
   const oauth2 = google.oauth2({ version: 'v2', auth: client });
-  const { data } = await oauth2.userinfo.get();
+  const { data } = await oauth2.userinfo.get(); // 👈 indeholder navn og billede
 
   // Upsert på iUserModel
   let user = await iUserModel.findOne({ googleId: data.id });
@@ -57,6 +59,8 @@ export async function verifyGoogleCode(code: string) {
     user = new iUserModel({
       email: data.email,
       googleId: data.id,
+      name: data.name,         
+      picture: data.picture,
       refreshToken: tokens.refresh_token!,
       accessToken: tokens.access_token!,
       expiryDate: tokens.expiry_date ? new Date(tokens.expiry_date) : undefined
@@ -66,8 +70,19 @@ export async function verifyGoogleCode(code: string) {
     if (tokens.refresh_token) user.refreshToken = tokens.refresh_token;
     if (tokens.expiry_date) user.expiryDate = new Date(tokens.expiry_date);
   }
+
   await user.save();
-  return { user, tokens };
+
+  // Tilføj navn og billede fra Google til det objekt du returnerer
+  return {
+    user: {
+      ...user.toObject(),
+      name: data.name,
+      picture: data.picture,
+      accessToken: tokens.access_token // 👈 denne linje er nødvendig
+    },
+    tokens
+  };
 }
 
 /**
