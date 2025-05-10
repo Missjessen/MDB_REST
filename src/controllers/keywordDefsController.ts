@@ -1,7 +1,7 @@
 // src/controllers/keywordDefsController.ts
 import { RequestHandler } from 'express';
 //import { connect, disconnect } from '../repository/database';
-import { KeywordDefModel } from '../models/KeywordDefModel';
+import { KeywordDefModel } from '../models/keywordDefModel';
 import { AuthenticatedRequest } from '../interfaces/userReq';
 import { syncKeywordDefsFromSheet } from '../services/keywordDefsService';
 import { createOAuthClient } from '../services/googleAuthService';

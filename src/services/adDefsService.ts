@@ -1,7 +1,7 @@
 // src/services/adDefsService.ts
 import { OAuth2Client } from 'google-auth-library';
 import { connect, disconnect } from '../repository/database';
-import { AdDefModel } from '../models/AdDefModel';
+import { AdDefModel } from '../models/adDefModel';
 //import { parseAdsFromSheet } from './googleSheetsService';
 import { google } from 'googleapis';
 
