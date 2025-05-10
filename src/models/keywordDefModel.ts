@@ -1,6 +1,6 @@
 // src/models/KeywordDefModel.ts
 import { Schema, model, Document } from 'mongoose';
-import { IKeywordDef } from '../interfaces/IKeywordDef';
+import { IKeywordDef } from '../interfaces/iKeywordDef';
 
 export interface KeywordDefDoc extends Omit<IKeywordDef,'_id'>, Document {}
 

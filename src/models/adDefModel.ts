@@ -1,6 +1,6 @@
 // src/models/AdDefModel.ts
 import { Schema, model, Document } from 'mongoose';
-import { IAdDef } from '../interfaces/IAdDef';
+import { IAdDef } from '../interfaces/iAdDef';
 
 // Omit<IAdDef,'_id'> fjerner _id fra dit interface,
 // så Document kun kommer med den én gang.

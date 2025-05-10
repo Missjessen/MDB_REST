@@ -1,6 +1,6 @@
 // src/models/CampaignDefModel.ts
 import { Schema, model, Document } from 'mongoose';
-import { ICampaignDef } from '../interfaces/ICampaignDef';
+import { ICampaignDef } from '../interfaces/iCampaignDef';
 
 export interface CampaignDefDoc extends Document, Omit<ICampaignDef,'_id'> {}
 
