@@ -1,7 +1,7 @@
 // src/controllers/adDefsController.ts
 import { RequestHandler } from 'express';
 //import { connect, disconnect } from '../repository/database';
-import { AdDefModel } from '../models/AdDefModel';
+import { AdDefModel } from '../models/adDefModel';
 import { AuthenticatedRequest } from '../interfaces/userReq';
 import { syncAdDefsFromSheet, deleteAdRowInSheet, updateAdRowInSheet } from '../services/adDefsService';
 import { createOAuthClient } from '../services/googleAuthService';
