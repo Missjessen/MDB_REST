@@ -1,12 +1,12 @@
 // controllers/googleAdsController.ts
 import { Request, Response } from 'express';
 import { iUserModel } from '../models/iUserModel';
-import { connect, disconnect } from '../repository/database';
-import { getCampaignsForUser } from '../services/googleAdsService';
+//import { connect, disconnect } from '../repository/database';
+//import { getCampaignsForUser } from '../services/googleAdsService';
 import { createTestAccount } from '../services/googleAds/createTestAccount';
 //import { syncSheetToAds } from '../services/googleAdsSyncService';
-import { google } from 'googleapis';
-import { AuthenticatedRequest } from '../interfaces/userReq';
+//import { google } from 'googleapis';
+//import { AuthenticatedRequest } from '../interfaces/userReq';
 
 
 

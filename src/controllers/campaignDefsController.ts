@@ -1,6 +1,6 @@
 // src/controllers/campaignDefsController.ts
 import { RequestHandler } from 'express';
-import { connect, disconnect } from '../repository/database';
+//import { connect, disconnect } from '../repository/database';
 import { CampaignDefModel } from '../models/CampaignDefModel';
 import { AuthenticatedRequest } from '../interfaces/userReq';
 import { syncCampaignDefsFromSheet } from '../services/campaignDefsService';

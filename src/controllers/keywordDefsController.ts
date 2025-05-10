@@ -1,6 +1,6 @@
 // src/controllers/keywordDefsController.ts
 import { RequestHandler } from 'express';
-import { connect, disconnect } from '../repository/database';
+//import { connect, disconnect } from '../repository/database';
 import { KeywordDefModel } from '../models/KeywordDefModel';
 import { AuthenticatedRequest } from '../interfaces/userReq';
 import { syncKeywordDefsFromSheet } from '../services/keywordDefsService';

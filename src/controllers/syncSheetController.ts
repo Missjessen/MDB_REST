@@ -1,25 +1,25 @@
 // src/controllers/sheetsController.ts
 
 import { Request, Response, NextFunction } from 'express';
-import { connect, disconnect } from '../repository/database';
+//import { connect, disconnect } from '../repository/database';
 
 import { AuthenticatedRequest } from '../interfaces/userReq';
 import { createOAuthClient } from '../services/googleAuthService';
-import {
-  syncCampaignDefsFromSheet
-} from '../services/campaignDefsService';
-import {
-  syncAdDefsFromSheet
-} from '../services/adDefsService';
-import {
-  syncKeywordDefsFromSheet
-} from '../services/keywordDefsService';
+// import {
+//   syncCampaignDefsFromSheet
+// } from '../services/campaignDefsService';
+// import {
+//   syncAdDefsFromSheet
+// } from '../services/adDefsService';
+// import {
+//   syncKeywordDefsFromSheet
+// } from '../services/keywordDefsService';
 
 import { syncAllFromSheet } from '../services/syncSheetToAds';
 import { syncSheetToAds }   from '../services/syncSheetToAds';
 
 // src/services/sheetSyncService.ts
-import { OAuth2Client } from 'google-auth-library';
+//import { OAuth2Client } from 'google-auth-library';
 
 
 

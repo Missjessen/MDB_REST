@@ -2,9 +2,9 @@
 
 import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
-import { connect, disconnect } from '../repository/database';
+//import { connect, disconnect } from '../repository/database';
 import { verifyGoogleCode, getAuthUrl } from '../services/googleAuthService';
-import { iUserModel } from '../models/iUserModel';
+//import { iUserModel } from '../models/iUserModel';
 import { AuthenticatedRequest } from '../interfaces/userReq';
 
 /**

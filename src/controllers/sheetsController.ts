@@ -1,8 +1,8 @@
-import { RequestHandler, NextFunction, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { Types } from 'mongoose';
-import { connect, disconnect } from '../repository/database';
+//import { connect, disconnect } from '../repository/database';
 import { SheetModel } from '../models/SheetModel';
-import { createUserSheet, updateGoogleSheetTitle } from '../services/googleSheetsService';
+import { createUserSheet } from '../services/googleSheetsService';
 import { createOAuthClient } from '../services/googleAuthService';
 //import { syncSheetToAds } from '../services/syncSheetToAds';
 import { AuthenticatedRequest } from '../interfaces/userReq';
