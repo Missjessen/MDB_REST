@@ -1,8 +1,9 @@
+import { NextFunction, Request, Response } from "express";
 import cookieParser from 'cookie-parser';
 import express, { Application } from "express";
 import dotenvFlow from "dotenv-flow";
 import cors from "cors";  
-import { connect } from "./repository/database";
+//import { connect } from "./repository/database";
 import router from "./routes";
 import { setupSwagger } from "./util/documentationSwag";
 import authRoutes from './routes/authRoutes';
@@ -60,6 +61,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.warn(`[CORS] Blocked origin: ${origin}`);
       callback(new Error(`CORS‐fejl: Origin ${origin} ikke tilladt`));
     }
   },
@@ -69,21 +71,6 @@ app.use(cors({
 }));
 
 
-// const allowedOrigins = 
-// process.env.ALLOWED_ORIGINS?.split(',') || [];
-  
-//   app.use(cors({
-//     origin: function (origin, callback) {
-//       if (!origin || allowedOrigins.includes(origin)) {
-//         callback(null, true);
-//       } else {
-//         callback(new Error('CORS-fejl: Origin ikke tilladt'));
-//       }
-//     },
-//     credentials: true,
-//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//     allowedHeaders: ['Content-Type', 'Authorization', 'auth-token']
-//   }));
 
 
 // ======================== MIDDLEWARE SETUP ========================
@@ -147,6 +134,17 @@ app.use(express.urlencoded({ extended: true }));
 
     // Swagger documentation
     setupSwagger(app);
+
+    // 404-håndtering
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ error: 'Route ikke fundet' });
+});
+
+// Global error-handler (JSON)
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  console.error('[API] Unhandled error:', err);
+  res.status(500).json({ error: err.message || 'Internal Server Error' });
+});
 
   
     export default app;
