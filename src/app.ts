@@ -104,7 +104,10 @@ app.use(express.urlencoded({ extended: true }));
             "script-src": ["'self'"],
     
             // 5) Connect: din frontends og backends origin (hvis du bruger fetch/WS)
-            "connect-src": ["'self'", "http://localhost:4000"],
+            "connect-src": [
+              "'self'",
+              ...allowedOrigins
+            ],
     
             // 6) Billeder o.l.: egen host + data:
             "img-src": ["'self'", "data:"],
@@ -129,7 +132,7 @@ app.use(express.urlencoded({ extended: true }));
     app.use('/api/keyword-defs', keywordsRouter);
 
     app.use('/api/sheets/sync', syncRouter);
-    
+  
 
 
     // Swagger documentation
