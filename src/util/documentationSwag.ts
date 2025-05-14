@@ -1,32 +1,22 @@
 // src/util/documentationSwag.ts
-import { Application, Request, Response } from 'express';
+import { Application } from 'express';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 
 export function setupSwagger(app: Application) {
-  // 1) Miljø-variabler
-  const apiBase        = process.env.API_BASE_URL     || 'http://localhost:4000';
-  const googleClientId = process.env.GOOGLE_CLIENT_ID!;
+  const apiBase = process.env.API_BASE_URL || 'http://localhost:4000';
 
-  // 2) OpenAPI-definition
   const swaggerDefinition = {
     openapi: '3.0.1',
     info: {
       title:       'API Documentation',
       version:     '1.0.0',
-      description: 'Dokumentation for Auth, Sheets, Campaigns, Ads, Keywords & Google OAuth2'
+      description: 'Dokumentation for Auth, Sheets, Campaigns, Ads, Keywords'
     },
     servers: [
       { url: apiBase,          description: 'Root Server (Auth & Docs)' },
       { url: `${apiBase}/api`, description: 'API Server (Protected)' }
-    ],
-    tags: [
-      { name: 'Auth',      description: 'Google OAuth2-login og brugerinfo' },
-      { name: 'Sheets',    description: 'Google Sheets metadata' },
-      { name: 'Campaigns', description: 'Campaign definitions' },
-      { name: 'Ads',       description: 'Ad definitions' },
-      { name: 'Keywords',  description: 'Keyword definitions' }
     ],
     components: {
       securitySchemes: {
@@ -34,23 +24,6 @@ export function setupSwagger(app: Application) {
           type:         'http',
           scheme:       'bearer',
           bearerFormat: 'JWT'
-        },
-        googleOAuth: {
-          type: 'oauth2',
-          flows: {
-            authorizationCode: {
-              authorizationUrl: `${apiBase}/auth/google`,
-              tokenUrl:         `${apiBase}/auth/token`,
-              scopes: {
-                'https://www.googleapis.com/auth/adwords':        'Google Ads API',
-                'https://www.googleapis.com/auth/spreadsheets':   'Google Sheets API',
-                'https://www.googleapis.com/auth/drive.file':     'Drive file access',
-                'https://www.googleapis.com/auth/drive.readonly': 'Drive read-only access',
-                'https://www.googleapis.com/auth/userinfo.email': 'Læs brugerens e-mail',
-                'https://www.googleapis.com/auth/userinfo.profile':'Læs brugerens profil'
-              }
-            }
-          }
         }
       },
       schemas: {
@@ -121,12 +94,17 @@ export function setupSwagger(app: Application) {
       }
     },
     security: [
-      { googleOAuth: [] },
-      { bearerAuth:  [] }
+      { bearerAuth: [] }
+    ],
+    tags: [
+      { name: 'Auth',      description: 'Login og brugerinfo (hentes via Postman)' },
+      { name: 'Sheets',    description: 'Google Sheets metadata' },
+      { name: 'Campaigns', description: 'Campaign definitions' },
+      { name: 'Ads',       description: 'Ad definitions' },
+      { name: 'Keywords',  description: 'Keyword definitions' }
     ]
   };
 
-  // 3) Generér OpenAPI-spec
   const swaggerSpec = swaggerJsdoc({
     definition: swaggerDefinition,
     apis: [
@@ -135,29 +113,6 @@ export function setupSwagger(app: Application) {
     ]
   });
 
-  // 4) Serve oauth2-redirect.html med en fuld, absolut sti
-  const redirectHtml = path.resolve(
-    __dirname,
-    '../../node_modules/swagger-ui-dist/oauth2-redirect.html'
-  );
-  app.get('/oauth2-redirect.html', (_req: Request, res: Response) => {
-    res.sendFile(redirectHtml);
-  });
-
-  // 5) Mount Swagger UI på /docs
-  app.use(
-    '/docs',
-    swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec, {
-      swaggerOptions: {
-        deepLinking: false,
-        oauth2RedirectUrl: `${apiBase}/oauth2-redirect.html`,
-        oauth: {
-          clientId:                          googleClientId,
-          usePkceWithAuthorizationCodeGrant: true,
-          useBasicAuthenticationWithAccessCodeGrant: false
-        }
-      }
-    })
-  );
+  // Mount Swagger UI
+  app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }
