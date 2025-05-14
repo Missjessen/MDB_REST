@@ -4,15 +4,12 @@ import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 
-// Vi bruger require + any for at undgå manglende .d.ts
-const swaggerUiDist: any = require('swagger-ui-dist');
-
 export function setupSwagger(app: Application) {
-  // 1) Miljø‐variabler
+  // 1) Miljø-variabler
   const apiBase        = process.env.API_BASE_URL     || 'http://localhost:4000';
   const googleClientId = process.env.GOOGLE_CLIENT_ID!;
 
-  // 2) OpenAPI‐definition
+  // 2) OpenAPI-definition
   const swaggerDefinition = {
     openapi: '3.0.1',
     info: {
@@ -42,9 +39,7 @@ export function setupSwagger(app: Application) {
           type: 'oauth2',
           flows: {
             authorizationCode: {
-              // Starter Google-flowet (GET /auth/google)
               authorizationUrl: `${apiBase}/auth/google`,
-              // Swagger UI poster { code, codeVerifier } til (/auth/token)
               tokenUrl:         `${apiBase}/auth/token`,
               scopes: {
                 'https://www.googleapis.com/auth/adwords':        'Google Ads API',
@@ -131,7 +126,7 @@ export function setupSwagger(app: Application) {
     ]
   };
 
-  // 3) Generér OpenAPI‐spec
+  // 3) Generér OpenAPI-spec
   const swaggerSpec = swaggerJsdoc({
     definition: swaggerDefinition,
     apis: [
@@ -140,10 +135,13 @@ export function setupSwagger(app: Application) {
     ]
   });
 
-  // 4) Servér det statiske oauth2-redirect.html
+  // 4) Serve oauth2-redirect.html med en fuld, absolut sti
+  const redirectHtml = path.resolve(
+    __dirname,
+    '../../node_modules/swagger-ui-dist/oauth2-redirect.html'
+  );
   app.get('/oauth2-redirect.html', (_req: Request, res: Response) => {
-    const filePath = path.join(swaggerUiDist.getAbsoluteFSPath(), 'oauth2-redirect.html');
-    res.sendFile(filePath);
+    res.sendFile(redirectHtml);
   });
 
   // 5) Mount Swagger UI på /docs
@@ -152,13 +150,11 @@ export function setupSwagger(app: Application) {
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec, {
       swaggerOptions: {
-        // Slå deepLinking‐advarsel fra:
         deepLinking: false,
-        // Peg på backend’s redirect‐side:
         oauth2RedirectUrl: `${apiBase}/oauth2-redirect.html`,
         oauth: {
-          clientId:                            googleClientId,
-          usePkceWithAuthorizationCodeGrant:   true,
+          clientId:                          googleClientId,
+          usePkceWithAuthorizationCodeGrant: true,
           useBasicAuthenticationWithAccessCodeGrant: false
         }
       }
