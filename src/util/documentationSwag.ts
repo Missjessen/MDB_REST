@@ -1,19 +1,18 @@
 // src/util/documentationSwag.ts
-import { Application } from 'express';
+import { Application, Request, Response } from 'express';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 
-/**
- * Configures and serves Swagger UI with JWT Bearer and Google OAuth2 (PKCE) support,
- * covering all /auth/* and /api/* routes.
- */
+// Vi bruger require + any for at undgå manglende .d.ts
+const swaggerUiDist: any = require('swagger-ui-dist');
+
 export function setupSwagger(app: Application) {
-  // 1) Miljø-variabler
+  // 1) Miljø‐variabler
   const apiBase        = process.env.API_BASE_URL     || 'http://localhost:4000';
   const googleClientId = process.env.GOOGLE_CLIENT_ID!;
 
-  // 2) OpenAPI-definition
+  // 2) OpenAPI‐definition
   const swaggerDefinition = {
     openapi: '3.0.1',
     info: {
@@ -22,42 +21,38 @@ export function setupSwagger(app: Application) {
       description: 'Dokumentation for Auth, Sheets, Campaigns, Ads, Keywords & Google OAuth2'
     },
     servers: [
-      { url: apiBase,           description: 'Root Server (Auth & Docs)' },
-      { url: `${apiBase}/api`,  description: 'API Server (Protected)' },
-      { url: 'http://localhost:4000',     description: 'Local Root' },
-      { url: 'http://localhost:4000/api', description: 'Local API' }
+      { url: apiBase,          description: 'Root Server (Auth & Docs)' },
+      { url: `${apiBase}/api`, description: 'API Server (Protected)' }
     ],
     tags: [
       { name: 'Auth',      description: 'Google OAuth2-login og brugerinfo' },
-      { name: 'Sheets',    description: 'Operations on Google Sheets metadata' },
-      { name: 'Campaigns', description: 'Operations on Campaign definitions' },
-      { name: 'Ads',       description: 'Operations on Ad definitions' },
-      { name: 'Keywords',  description: 'Operations on Keyword definitions' }
+      { name: 'Sheets',    description: 'Google Sheets metadata' },
+      { name: 'Campaigns', description: 'Campaign definitions' },
+      { name: 'Ads',       description: 'Ad definitions' },
+      { name: 'Keywords',  description: 'Keyword definitions' }
     ],
     components: {
       securitySchemes: {
-        // JWT-Bearer for dine /api/*-endpoints
         bearerAuth: {
           type:         'http',
           scheme:       'bearer',
           bearerFormat: 'JWT'
         },
-        // Google OAuth2 PKCE flow for Swagger UI
         googleOAuth: {
           type: 'oauth2',
           flows: {
             authorizationCode: {
-              // 1) Swagger UI trækker denne URL for at starte Google-flowet
+              // Starter Google-flowet (GET /auth/google)
               authorizationUrl: `${apiBase}/auth/google`,
-              // 2) Swagger UI poster { code, codeVerifier } her for at få tokens retur
+              // Swagger UI poster { code, codeVerifier } til (/auth/token)
               tokenUrl:         `${apiBase}/auth/token`,
               scopes: {
-                'https://www.googleapis.com/auth/adwords':          'Google Ads API',
-                'https://www.googleapis.com/auth/spreadsheets':     'Google Sheets API',
-                'https://www.googleapis.com/auth/drive.file':       'Read+write Drive files',
-                'https://www.googleapis.com/auth/drive.readonly':   'Read-only Drive',
-                'https://www.googleapis.com/auth/userinfo.email':   'Læs brugerens e-mail',
-                'https://www.googleapis.com/auth/userinfo.profile': 'Læs brugerens profil'
+                'https://www.googleapis.com/auth/adwords':        'Google Ads API',
+                'https://www.googleapis.com/auth/spreadsheets':   'Google Sheets API',
+                'https://www.googleapis.com/auth/drive.file':     'Drive file access',
+                'https://www.googleapis.com/auth/drive.readonly': 'Drive read-only access',
+                'https://www.googleapis.com/auth/userinfo.email': 'Læs brugerens e-mail',
+                'https://www.googleapis.com/auth/userinfo.profile':'Læs brugerens profil'
               }
             }
           }
@@ -136,7 +131,7 @@ export function setupSwagger(app: Application) {
     ]
   };
 
-  // 3) Generér OpenAPI-spec
+  // 3) Generér OpenAPI‐spec
   const swaggerSpec = swaggerJsdoc({
     definition: swaggerDefinition,
     apis: [
@@ -145,14 +140,10 @@ export function setupSwagger(app: Application) {
     ]
   });
 
-  // 4) Servér statisk oauth2-redirect.html fra swagger-ui-dist
-  app.get('/oauth2-redirect.html', (_req, res) => {
-    res.sendFile(
-      path.join(
-        __dirname,
-        '../../node_modules/swagger-ui-dist/oauth2-redirect.html'
-      )
-    );
+  // 4) Servér det statiske oauth2-redirect.html
+  app.get('/oauth2-redirect.html', (_req: Request, res: Response) => {
+    const filePath = path.join(swaggerUiDist.getAbsoluteFSPath(), 'oauth2-redirect.html');
+    res.sendFile(filePath);
   });
 
   // 5) Mount Swagger UI på /docs
@@ -161,9 +152,9 @@ export function setupSwagger(app: Application) {
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec, {
       swaggerOptions: {
-        // Slå deepLinking advarsel fra
+        // Slå deepLinking‐advarsel fra:
         deepLinking: false,
-        // Peg på backend’s redirect
+        // Peg på backend’s redirect‐side:
         oauth2RedirectUrl: `${apiBase}/oauth2-redirect.html`,
         oauth: {
           clientId:                            googleClientId,
