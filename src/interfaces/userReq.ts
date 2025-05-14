@@ -4,9 +4,9 @@ import { Request } from 'express';
 export interface JwtUserPayload {
   _id: string
   email: string
-  name: string         // ✅ korrekt type
-  picture: string      // ✅ korrekt type
-  googleId?: string    // valgfri hvis ikke i JWT
+  name: string         
+  picture: string      
+  googleId?: string   
   refreshToken?: string
   accessToken?: string
   iat: number

@@ -1,13 +1,12 @@
 import { NextFunction, Response } from 'express';
 import { Types } from 'mongoose';
-//import { connect, disconnect } from '../repository/database';
 import { SheetModel } from '../models/SheetModel';
 import { createUserSheet } from '../services/googleSheetsService';
 import { createOAuthClient } from '../services/googleAuthService';
-//import { syncSheetToAds } from '../services/syncSheetToAds';
 import { AuthenticatedRequest } from '../interfaces/userReq';
 import { google } from 'googleapis';
 //import { syncAllFromSheet } from '../services/sheetService';
+//import { syncSheetToAds } from '../services/syncSheetToAds';
 
 // ░▒▓██ get, post, put, delete (CRUD)██▓▒░
 /**
@@ -49,51 +48,6 @@ export const createSheet = async (
     }
   }
 };
-// export const createSheet: RequestHandler = async (req, res) => {
-//   const user = (req as AuthenticatedRequest).user!;
-//   const name = req.body.name as string;
-
-//   if (!name) {
-//     res.status(400).json({ error: 'Navn på sheet mangler' });
-//     return;
-//   }
-
-//   //await connect();
-//   try {
-//     // 1) For‐check om sheet med samme navn allerede findes
-//     const exists = await SheetModel.findOne({ userId: user._id, name });
-//     if (exists) {
-//       res.status(409).json({ error: 'Du har allerede et sheet med dette navn' });
-//       return;
-//     }
-
-//     // 2) Opret sheet i Google
-//     const oauth = createOAuthClient();
-//     oauth.setCredentials({ refresh_token: user.refreshToken });
-//     const sheetId = await createUserSheet(oauth, name);
-//     const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}`;
-
-//     // 3) Gem metadata i MongoDB
-//     const sheet = await SheetModel.create({
-//       userId: new Types.ObjectId(user._id),
-//       sheetId,
-//       name,
-//       sheetUrl
-//     });
-
-//     res.status(201).json(sheet);
-//     return;
-//   } catch (err: any) {
-//     // Fange duplicate‐key hvis for‐check blev sprunget over
-//     if (err.code === 11000) {
-//       res.status(409).json({ error: 'Sheet-navn allerede i brug' });
-//     } else {
-//       res.status(500).json({ error: err.message });
-//     }
-//   } //finally {
-//     //await disconnect();
-//   //}
-// };
 
 /**
  * GET /api/sheets
@@ -111,24 +65,6 @@ export const getSheets = async (
     next(err);
   }
 };
-// export const getSheets: RequestHandler = async (req, res) => {
-//   const user = (req as AuthenticatedRequest).user;
-//   if (!user) {
-//     res.status(401).json({ error: 'Login kræves' });
-//     return;
-//   }
-
-//   //await connect();
-//   try {
-//     const docs = await SheetModel.find({ userId: user._id }).lean().exec();
-//     res.json(docs);
-//     return;
-//   } catch (err: any) {
-//     res.status(500).json({ error: err.message });
-//     return;
-//   } 
-  
-// };
 
 /**
  * GET /api/sheets/:sheetId
@@ -151,33 +87,6 @@ export const getSheetById = async (
     next(err);
   }
 };
-// export const getSheetById: RequestHandler = async (req, res) => {
-//   const user = (req as AuthenticatedRequest).user;
-//   const { sheetId } = req.params;
-
-//   if (!user) {
-//     res.status(401).json({ error: 'Login kræves' });
-//     return;
-//   }
-
-//   //await connect();
-//   try {
-//     const doc = await SheetModel.findOne({ _id: sheetId, userId: user._id })
-//       .lean()
-//       .exec();
-//     if (!doc) {
-//       res.status(404).json({ error: 'Sheet ikke fundet' });
-//       return;
-//     }
-//     res.json(doc);
-//     return;
-//   } catch (err: any) {
-//     res.status(500).json({ error: err.message });
-//     return;
-//   } //finally {
-//     //await disconnect();
-//   //}
-// };
 
 /**
  * PUT /api/sheets/:sheetId
@@ -313,7 +222,7 @@ export const deleteSheetById = async (
   }
 };
 
-// export const deleteSheet: RequestHandler = async (req, res): Promise<void> => {
+
 //   const user = (req as AuthenticatedRequest).user;
 //   const mongoId = req.params.sheetId;  // MongoDB‐ID, ikke selve Google‐ID
 

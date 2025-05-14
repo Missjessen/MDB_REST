@@ -1,7 +1,6 @@
 // src/services/googleSheets/campaignSheetService.ts
 import { google } from 'googleapis';
 import type { OAuth2Client } from 'google-auth-library';
-//import { connect, disconnect } from '../repository/database';
 import { CampaignDefModel } from '../models/CampaignDefModel';
 import type { ICampaignDef} from '../interfaces/iCampaignDef';
 import { Types } from 'mongoose';

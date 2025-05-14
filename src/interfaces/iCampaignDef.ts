@@ -9,7 +9,7 @@ export interface ICampaignDef {
   startDate:  string;
   endDate:    string;
   budget?:    number;
-  rowIndex:   number;      // NYT
+  rowIndex:   number;      // two ways sync
   createdAt?:  Date;
 }
 

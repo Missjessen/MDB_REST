@@ -50,63 +50,6 @@ export async function getCampaignsForUser(user: IUser) {
 
 
 
-
-
-
-
-
-
-
-/* import { GoogleAdsApi } from 'google-ads-api';
-import { IUser } from '../interfaces/iUser';
-
-// Opretter Google Ads API-klient
-export async function getAdsClient(user: IUser) {
-    try {
-        const client = new GoogleAdsApi({
-            client_id: process.env.GOOGLE_CLIENT_ID!,
-            client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-            developer_token: process.env.GOOGLE_DEVELOPER_TOKEN!,
-        });
-
-        return client.Customer({
-            customer_id: process.env.GOOGLE_TEST_ACCOUNT_ID!,      // Testkontoens ID
-            login_customer_id: process.env.GOOGLE_TEST_ACCOUNT_ID!, // Samme ID her
-            refresh_token: user.refreshToken!,
-      
-        });
-    } catch (error) {
-        console.error("Fejl ved oprettelse af Google Ads klient: ", error);
-        throw error;
-    }
-}
-
-  
-
-
-   const client = new GoogleAdsApi({
-        client_id: process.env.GOOGLE_CLIENT_ID!,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        developer_token: process.env.GOOGLE_DEVELOPER_TOKEN!,
-    });
-    
-    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN!; 
-    
-    export async function listCustomers() {
-        try {
-            const customers = await client.listAccessibleCustomers(refreshToken);
-            return customers;
-        } catch (error) {
-            console.error("Fejl ved hentning af kunder:", error);
-            throw error;
-        }
-    }
- */
-
-
-
-
-
 /*   export const getCustomer = (customerId: string, refreshToken: string) => {
     return client.Customer({
       customer_id: customerId,
@@ -141,50 +84,4 @@ export async function getAdsClient(user: IUser) {
 
     
     
- /*    export async function fetchCampaignsWithGAQL(customerId: string, refreshToken: string) {
-        try {
-            // Opret kunden
-            const customer = client.Customer({
-                customer_id: customerId,
-                refresh_token: refreshToken,
-            });
-    
-            // Brug GAQL til at hente kampagner
-            const query = `
-                SELECT 
-                    campaign.id, 
-                    campaign.name, 
-                    campaign.bidding_strategy_type, 
-                    campaign_budget.amount_micros, 
-                    metrics.cost_micros, 
-                    metrics.clicks, 
-                    metrics.impressions, 
-                    metrics.all_conversions
-                FROM campaign
-                WHERE campaign.status = "ENABLED"
-                LIMIT 5
-            `;
-    
-            const campaigns = await customer.query(query);
-    
-            // Tjek om kampagner blev hentet
-            if (!campaigns || campaigns.length === 0) {
-                console.log("🔍 Ingen kampagner fundet.");
-                return [];
-            }
-    
-            // Log kampagnerne
-            console.log("✅ Kampagner via GAQL:", campaigns);
-            return campaigns;
-    
-        } catch (error) {
-            console.error("Fejl under GAQL-hentning af kampagner:" +  error);
-            throw error;
-        }
-    } */
-    
-   /*  // Testkald
-    fetchCampaignsWithGAQL("DIN_CUSTOMER_ID", "DIN_REFRESH_TOKEN"); */
-    
-
-    
+ 

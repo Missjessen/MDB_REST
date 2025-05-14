@@ -4,8 +4,8 @@ import { Types } from 'mongoose';
 export interface ISheet {
   _id:       Types.ObjectId;
   userId:    Types.ObjectId;
-  sheetId:   string;        // Google Sheets ID
-  name:      string;        // Dit eget navn på arket
+  sheetId:   string;        
+  name:      string;       
   sheetUrl:  string;        // https://docs.google.com/…
   createdAt: Date;
   lastSynced?: Date;

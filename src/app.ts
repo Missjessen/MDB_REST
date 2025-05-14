@@ -10,8 +10,11 @@ import authRoutes from './routes/authRoutes';
 
 import sheetsRoutes from './routes/sheetsRoutes';
 import adRoutes from './routes/adRoutes';
+import keywordsRouter from './routes/keywordRoutes';
+import campaignDefsRoutes from './routes/campaignDefsRoutes';
 import syncRouter from './routes/syncRoutes';
 import helmet from 'helmet'
+import path from 'path';
 
 
 
@@ -24,9 +27,7 @@ import { generalLimiter } from './middleware/rateLimiter';
 
 
 import dotenv from 'dotenv';
-import campaignRouter from './routes/campaignDefsRoutes';
-import keywordsRouter from './routes/keywordRoutes';
-import campaignDefsRoutes from './routes/campaignDefsRoutes';
+
 dotenv.config();
 
 
@@ -120,7 +121,7 @@ app.use(express.urlencoded({ extended: true }));
     
 
     // Route setup
-    app.use(cookieParser()); // 🧠 Dette tilføjer req.cookies
+    app.use(cookieParser()); // req.cookies
     app.use("/api", router); 
     app.use('/auth', authRoutes);
   
@@ -133,15 +134,22 @@ app.use(express.urlencoded({ extended: true }));
 
     app.use('/api/sheets/sync', syncRouter);
   
-
+   
 
     // Swagger documentation
     setupSwagger(app);
+
+
+app.use(express.static(path.join(__dirname, 'public')));
+app.get('*', (_req, res) => res.sendFile('index.html'));
+
 
     // 404-håndtering
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Route ikke fundet' });
 });
+
+
 
 // Global error-handler (JSON)
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

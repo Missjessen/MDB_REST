@@ -4,8 +4,9 @@ import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 //import { connect, disconnect } from '../repository/database';
 import { verifyGoogleCode, getAuthUrl } from '../services/googleAuthService';
-//import { iUserModel } from '../models/iUserModel';
+import { iUserModel } from '../models/iUserModel';
 import { AuthenticatedRequest } from '../interfaces/userReq';
+import { OAuth2Client } from 'google-auth-library';
 
 /**
  * Starter Google OAuth2‑flow.
@@ -22,124 +23,43 @@ export const googleLogin: RequestHandler = (_req, res) => {
  */
 export const googleCallback: RequestHandler = async (req, res, next) => {
   const code = req.query.code as string;
-
   if (!code) {
     res.status(400).json({ error: 'Manglende kode fra Google' });
-    return;
+    return;  // <— return void
   }
 
   try {
     const { user, tokens } = await verifyGoogleCode(code);
-
     const jwtToken = jwt.sign(
-      {
-        _id: user._id.toString(),
-        email: user.email,
-        name: user.name,
-        picture: user.picture
-      },
+      { _id: user._id.toString(), email: user.email, name: user.name, picture: user.picture },
       process.env.JWT_SECRET!,
       { expiresIn: '7d' }
     );
 
-    // ✅ VIGTIGT: Ingen return her – bare send JSON
-    res.json({
-      message: 'Login OK',
-      token: jwtToken,
-      user,
-      accessToken: tokens.access_token
-    });
+    const wantsJson =
+      req.query.json === 'true' ||
+      req.is('application/json') ||
+      (req.get('accept') || '').includes('application/json');
 
+    if (wantsJson) {
+      res.json({
+        message:     'Login OK',
+        token:       jwtToken,
+        accessToken: tokens.access_token,
+        user
+      });
+      return;  // <— return void
+    }
+
+    // Ellers redirect til frontend
+    const frontendUrl = process.env.FRONTEND_URL!;
+    res.redirect(`${frontendUrl}/auth/callback?token=${encodeURIComponent(jwtToken)}`);
+    return;  // <— return void
   } catch (err) {
-    next(err);
+    next(err);  // næste middleware/håndterer fejlen
+    return;     // <— return void
   }
 };
-
-// export const googleCallback: RequestHandler = async (req, res, next) => {
-//   const code = req.query.code as string
-//   if (!code) {
-//     res.status(400).json({ error: 'Manglende kode fra Google' })
-//     return
-//   }
-
-//   try {
-//     const { user, tokens } = await verifyGoogleCode(code)
-
-//     const jwtToken = jwt.sign(
-//       {
-//         _id: user._id.toString(),
-//         email: user.email,
-//         name: user.name,
-//         picture: user.picture,
-//         //exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60
-//       },
-//       process.env.JWT_SECRET!,
-//       { expiresIn: '7d' }
-//     )
-
-//     res.cookie('token', jwtToken, {
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === 'production',
-//       sameSite: 'lax',
-//       maxAge: 7 * 24 * 60 * 60 * 1000,
-//     })
-
-//     const wantsJson =
-//       req.query.json === 'true' || req.is('application/json') || !process.env.FRONTEND_URL
-
-//     if (wantsJson) {
-//       res.json({ message: 'Login OK', token: jwtToken, user })
-//     } else {
-//       const frontendUrl = process.env.FRONTEND_URL!
-//       res.redirect(`${frontendUrl}/auth/callback?token=${jwtToken}`)
-//     }
-//   } catch (err) {
-//     next(err)
-//   }
-// }
-
-
-// export const googleCallback: RequestHandler = async (req, res, next) => {
-//   const code = req.query.code as string;
-//   if (!code) {
-//     res.status(400).json({ error: 'Manglende kode fra Google' });
-//     return;               // <-- returnerer void
-//   }
-
-//   try {
-//     const { user, tokens } = await verifyGoogleCode(code);
-
-//     // Byg JWT
-//     const jwtToken = jwt.sign(
-//       { _id: user._id.toString(), email: user.email, /* … */ },
-//       process.env.JWT_SECRET!,
-//       { expiresIn: '7d' }
-//     );
-
-//     // Sæt cookie
-//     res.cookie('token', jwtToken, {
-//       httpOnly: true,
-//       secure:   process.env.NODE_ENV === 'production',
-//       sameSite: 'lax',
-//       maxAge:   7 * 24 * 60 * 60 * 1000,
-//     });
-
-//     // Hvis klienten vil have JSON (f.eks. ?json=true)
-//     if (req.query.json === 'true' || req.is('application/json')) {
-//       res.json({ message: 'Login OK', token: jwtToken, user });
-//       return;             // <-- returnerer void
-//     }
-
-//     // Ellers redirect til frontend
-//     const frontendUrl = process.env.FRONTEND_URL!;
-//     res.redirect(`${frontendUrl}/auth/callback?token=${jwtToken}`);
-//     return;               // <-- returnerer void
-
-//   } catch (err) {
-//     next(err);            // giver fejlen videre til Express’ error-handler
-//     return;               // <-- returnerer void
-//   }
-// };
 
 
 /**
@@ -181,3 +101,53 @@ export const logout: RequestHandler = (req, res) => {
 
   res.status(200).json({ message: 'Logout successful' })
 }
+
+
+export const exchangeIdToken: RequestHandler = async (req, res, next) => {
+  const { idToken } = req.body;
+  if (!idToken) {
+    res.status(400).json({ error: 'Manglende idToken' });
+    return; 
+  }
+
+  try {
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    if (!payload) {
+      res.status(400).json({ error: 'Ugyldigt idToken' });
+      return;
+    }
+
+    let user = await iUserModel.findOne({ googleId: payload.sub });
+    if (!user) {
+      user = await iUserModel.create({
+        email:     payload.email,
+        googleId:  payload.sub,
+        name:      payload.name,
+        picture:   payload.picture,
+      });
+    }
+
+    const appToken = jwt.sign(
+      { _id: user._id.toString(), email: user.email },
+      process.env.JWT_SECRET!,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      message:     'Login OK',
+      token:       appToken,
+      accessToken: idToken,
+      user
+    });
+    return;  
+
+  } catch (err) {
+    next(err);
+    return;
+  }
+};

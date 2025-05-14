@@ -10,7 +10,7 @@ export interface IKeywordDef {
         keyword: string;
         matchType: 'BROAD' | 'PHRASE' | 'EXACT';
         cpc?: number;
-        rowIndex?: number;    // hvis du vil tracke række til two-way sync
+        rowIndex?: number;    //  two-way sync
         createdAt?: Date;
       }
   
