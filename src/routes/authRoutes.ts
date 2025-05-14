@@ -76,60 +76,7 @@ authRouter.get('/google/callback', googleCallback)
  */
 authRouter.get('/google', loginLimiter, googleLogin);
 
-// POST /auth/token  (Swagger UI bytter code + verifier til JSON‐tokens)
-/**
- * @openapi
- * /auth/token:
- *   post:
- *     summary: Exchange PKCE code + verifier for Google OAuth2 tokens
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [code, codeVerifier]
- *             properties:
- *               code:
- *                 type: string
- *               codeVerifier:
- *                 type: string
- *     responses:
- *       200:
- *         description: Google OAuth2 tokens
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 access_token:
- *                   type: string
- *                 refresh_token:
- *                   type: string
- *                 id_token:
- *                   type: string
- *                 expires_in:
- *                   type: integer
- *       400: { description: Manglende code eller codeVerifier }
- *       500: { description: Intern serverfejl }
- */
-authRouter.post('/token', async (req, res, next) => {
-  try {
-    const { code, codeVerifier } = req.body;
-    if (!code || !codeVerifier) {
-      res.status(400).json({ error: 'code og codeVerifier kræves' });
-      return;
-    }
-    const client = createOAuthClient();
-    const { tokens } = await client.getToken({ code, codeVerifier });
-    res.json(tokens);
-    return;
-  } catch (err) {
-    next(err);
-    return;
-  }
-});
+  
   
 
 /**

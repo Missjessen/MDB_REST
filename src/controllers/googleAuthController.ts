@@ -110,51 +110,51 @@ export const logout: RequestHandler = (req, res) => {
 }
 
 
-export const exchangeIdToken: RequestHandler = async (req, res, next) => {
-  const { idToken } = req.body;
-  if (!idToken) {
-    res.status(400).json({ error: 'Manglende idToken' });
-    return; 
-  }
+// export const exchangeIdToken: RequestHandler = async (req, res, next) => {
+//   const { idToken } = req.body;
+//   if (!idToken) {
+//     res.status(400).json({ error: 'Manglende idToken' });
+//     return; 
+//   }
 
-  try {
-    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
-    if (!payload) {
-      res.status(400).json({ error: 'Ugyldigt idToken' });
-      return;
-    }
+//   try {
+//     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+//     const ticket = await client.verifyIdToken({
+//       idToken,
+//       audience: process.env.GOOGLE_CLIENT_ID,
+//     });
+//     const payload = ticket.getPayload();
+//     if (!payload) {
+//       res.status(400).json({ error: 'Ugyldigt idToken' });
+//       return;
+//     }
 
-    let user = await iUserModel.findOne({ googleId: payload.sub });
-    if (!user) {
-      user = await iUserModel.create({
-        email:     payload.email,
-        googleId:  payload.sub,
-        name:      payload.name,
-        picture:   payload.picture,
-      });
-    }
+//     let user = await iUserModel.findOne({ googleId: payload.sub });
+//     if (!user) {
+//       user = await iUserModel.create({
+//         email:     payload.email,
+//         googleId:  payload.sub,
+//         name:      payload.name,
+//         picture:   payload.picture,
+//       });
+//     }
 
-    const appToken = jwt.sign(
-      { _id: user._id.toString(), email: user.email },
-      process.env.JWT_SECRET!,
-      { expiresIn: '7d' }
-    );
+//     const appToken = jwt.sign(
+//       { _id: user._id.toString(), email: user.email },
+//       process.env.JWT_SECRET!,
+//       { expiresIn: '7d' }
+//     );
 
-    res.json({
-      message:     'Login OK',
-      token:       appToken,
-      accessToken: idToken,
-      user
-    });
-    return;  
+//     res.json({
+//       message:     'Login OK',
+//       token:       appToken,
+//       accessToken: idToken,
+//       user
+//     });
+//     return;  
 
-  } catch (err) {
-    next(err);
-    return;
-  }
-};
+//   } catch (err) {
+//     next(err);
+//     return;
+//   }
+// };

@@ -14,7 +14,7 @@ import keywordsRouter from './routes/keywordRoutes';
 import campaignDefsRoutes from './routes/campaignDefsRoutes';
 import syncRouter from './routes/syncRoutes';
 import helmet from 'helmet'
-import path from 'path';
+
 
 
 
@@ -139,9 +139,6 @@ app.use(express.urlencoded({ extended: true }));
     // Swagger documentation
     setupSwagger(app);
 
-
-app.use(express.static(path.join(__dirname, 'public')));
-app.get('*', (_req, res) => res.sendFile('index.html'));
 
 
     // 404-håndtering
