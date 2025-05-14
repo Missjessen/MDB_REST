@@ -25,39 +25,46 @@ export const googleCallback: RequestHandler = async (req, res, next) => {
   const code = req.query.code as string;
   if (!code) {
     res.status(400).json({ error: 'Manglende kode fra Google' });
-    return;  // <— return void
+    return;
   }
 
   try {
+    // 1) Byt koden til Google‐tokens + bruger
     const { user, tokens } = await verifyGoogleCode(code);
+
+    // 2) Log Google‐token direkte i terminalen
+    console.log('=== Google OAuth2 tokens ===');
+    console.log('access_token:', tokens.access_token);
+    console.log('refresh_token:', tokens.refresh_token);
+    console.log('expiry_date:', tokens.expiry_date);
+
+    // 3) Opret din egen JWT
     const jwtToken = jwt.sign(
-      { _id: user._id.toString(), email: user.email, name: user.name, picture: user.picture },
+      {
+        _id:     user._id.toString(),
+        email:   user.email,
+        name:    user.name,
+        picture: user.picture
+      },
       process.env.JWT_SECRET!,
       { expiresIn: '7d' }
     );
 
-    const wantsJson =
-      req.query.json === 'true' ||
-      req.is('application/json') ||
-      (req.get('accept') || '').includes('application/json');
+    // 4) Log også din egen JWT, hvis du vil
+    console.log('=== Din applikations JWT ===');
+    console.log(jwtToken);
 
-    if (wantsJson) {
-      res.json({
-        message:     'Login OK',
-        token:       jwtToken,
-        accessToken: tokens.access_token,
-        user
-      });
-      return;  // <— return void
-    }
+    // 5) Svar browseren med noget simpelt – eller send JSON tilbage
+    res.json({
+      message: 'Login OK – tjek server‐terminal for tokens',
+      token:   jwtToken,
+      user
+    });
+    return;
 
-    // Ellers redirect til frontend
-    const frontendUrl = process.env.FRONTEND_URL!;
-    res.redirect(`${frontendUrl}/auth/callback?token=${encodeURIComponent(jwtToken)}`);
-    return;  // <— return void
   } catch (err) {
-    next(err);  // næste middleware/håndterer fejlen
-    return;     // <— return void
+    next(err);
+    return;
   }
 };
 
