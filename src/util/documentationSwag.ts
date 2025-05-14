@@ -1,157 +1,118 @@
+// src/util/swaggerConfig.ts
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import { Application } from 'express';
 
 export function setupSwagger(app: Application) {
-  const apiBase = process.env.API_BASE_URL || 'http://localhost:4000';
+  const localUrl = process.env.API_BASE_URL || 'http://localhost:4000';
+  const productionUrl = 'https://mdb-rest.onrender.com';
 
-  // Swagger opsætning
   const swaggerDefinition = {
     openapi: '3.0.1',
     info: {
-      title: 'API Documentation',
+      title: 'MDB REST API',
       version: '1.0.0',
-      description: 'API documentation for my app'
+      description:
+        '📄 Dokumentation for Sheets-, Campaigns-, Keywords- og Ads-endpoints.\n\n🔒 Alle ruter kræver JWT Bearer-token under "Authorize".',
     },
     servers: [
-      {
-        url: apiBase,
-        description: 'API server'
-      }
+      { url: localUrl, description: '🛠 Lokal udviklingsserver' },
+      { url: productionUrl, description: '🚀 Produktion (Render deploy)' },
     ],
     components: {
       securitySchemes: {
         bearerAuth: {
           type: 'http',
           scheme: 'bearer',
-          bearerFormat: 'JWT'
-        }
-      }
+          bearerFormat: 'JWT',
+        },
+      },
+      schemas: {
+        SheetInput: {
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string',
+              example: 'Google Ads kampagne',
+            },
+          },
+          required: ['name'],
+        },
+        Sheet: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string', example: '6643fae92735a8d799ca0e2a' },
+            name: { type: 'string', example: 'Google Ads kampagne' },
+            sheetUrl: { type: 'string', example: 'https://docs.google.com/spreadsheets/d/xyz123' },
+            userId: { type: 'string', example: '663abc12345def0000000000' },
+          },
+        },
+        ErrorResponse: {
+          type: 'object',
+          properties: {
+            error: {
+              type: 'string',
+              example: 'Sheet-navn allerede i brug',
+            },
+          },
+        },
+        CampaignDef: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            userId: { type: 'string' },
+            sheetId: { type: 'string' },
+            name: { type: 'string' },
+            status: { type: 'string', enum: ['ENABLED', 'PAUSED'] },
+            startDate: { type: 'string' },
+            endDate: { type: 'string' },
+            budget: { type: 'number' },
+            rowIndex: { type: 'number' },
+            createdAt: { type: 'string' }
+          }
+        },
+        KeywordDef: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            userId: { type: 'string' },
+            sheetId: { type: 'string' },
+            adGroup: { type: 'string' },
+            keyword: { type: 'string' },
+            matchType: { type: 'string', enum: ['BROAD','PHRASE','EXACT'] },
+            cpc: { type: 'number' },
+            rowIndex: { type: 'number' },
+            createdAt: { type: 'string' },
+          }
+        },
+        AdDef: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            userId: { type: 'string' },
+            sheetId: { type: 'string' },
+            adGroup: { type: 'string' },
+            headline1: { type: 'string' },
+            headline2: { type: 'string' },
+            description: { type: 'string' },
+            finalUrl: { type: 'string' },
+            path1: { type: 'string' },
+            path2: { type: 'string' },
+            rowIndex: { type: 'number' },
+            createdAt: { type: 'string' },
+          }
+        },
+      },
     },
+    security: [{ bearerAuth: [] }],
   };
 
   const options = {
     definition: swaggerDefinition,
-    apis: ['./src/routes/*.ts', './src/controllers/*.ts'], // Angiv dine sti til dine route- og controller-filer
+    apis: ['./src/routes/*.ts', './src/controllers/*.ts'],
   };
 
   const swaggerSpec = swaggerJsdoc(options);
 
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }
-
-
-// // src/util/documentationSwag.ts
-// import { Application } from 'express';
-// import swaggerUi from 'swagger-ui-express';
-// import swaggerJsdoc from 'swagger-jsdoc';
-
-// const swaggerDefinition = {
-//   openapi: '3.0.0',
-//   info: {
-//     title: 'API Documentation',
-//     version: '1.0.0',
-//     description: 'Complete API documentation for Sheets, Campaigns, Ads, Keywords and Google OAuth'
-//   },
-//   servers: [
-//     { url: 'http://localhost:4000/api', description: 'Local server' }
-//   ],
-//   tags: [
-//     { name: 'Sheets', description: 'Operations on Google Sheets metadata' },
-//     { name: 'Campaigns', description: 'Operations on Campaign definitions' },
-//     { name: 'Ads', description: 'Operations on Ad definitions' },
-//     { name: 'Keywords', description: 'Operations on Keyword definitions' },
-//     { name: 'Auth', description: 'Google OAuth2-login og brugerinfo' }
-//   ],
-//   components: {
-//     securitySchemes: {
-//       bearerAuth: {
-//         type: 'http',
-//         scheme: 'bearer',
-//         bearerFormat: 'JWT'
-//       }
-//     },
-//     schemas: {
-//       Sheet: {
-//         type: 'object',
-//         properties: {
-//           _id:       { type: 'string', example: '60f7c2d1e25e4b3a2b1c4d5e' },
-//           sheetId:   { type: 'string', example: '1AbCxyz1234567890' },
-//           name:      { type: 'string', example: 'My Sheet' },
-//           sheetUrl:  { type: 'string', example: 'https://docs.google.com/spreadsheets/d/1AbCxyz1234567890' },
-//           userId:    { type: 'string', example: '603d214f1c4ae9311ce2d799' }
-//         }
-//       },
-//       CampaignDef: {
-//         type: 'object',
-//         properties: {
-//           _id:      { type: 'string' },
-//           sheetId:  { type: 'string' },
-//           name:     { type: 'string' },
-//           status:   { type: 'string' },
-//           budget:   { type: 'number' },
-//           rowIndex: { type: 'integer' }
-//         }
-//       },
-//       AdDef: {
-//         type: 'object',
-//         properties: {
-//           _id:       { type: 'string' },
-//           sheetId:   { type: 'string' },
-//           adGroup:   { type: 'string' },
-//           headline1: { type: 'string' },
-//           headline2: { type: 'string' },
-//           description: { type: 'string' },
-//           finalUrl:  { type: 'string' }
-//         }
-//       },
-//       KeywordDef: {
-//         type: 'object',
-//         properties: {
-//           _id:       { type: 'string' },
-//           sheetId:   { type: 'string' },
-//           keyword:   { type: 'string' },
-//           matchType: { type: 'string' },
-//           cpc:       { type: 'number' }
-//         }
-//       },
-//       User: {
-//         type: 'object',
-//         properties: {
-//           _id:          { type: 'string', example: '650a1c2dbf1e4a1a1f2c3d4e' },
-//           email:        { type: 'string', format: 'email', example: 'nanna@example.com' },
-//           googleId:     { type: 'string', example: '117123456789012345678' },
-//           refreshToken: { type: 'string', example: 'ya29.a0ARrdaM…' },
-//           accessToken:  { type: 'string', example: 'ya29.a0ARrdaF…' },
-//           iat:          { type: 'integer', example: 1690000000 },
-//           exp:          { type: 'integer', example: 1690604800 }
-//         }
-//       },
-//       GoogleAuthResponse: {
-//         type: 'object',
-//         properties: {
-//           message: { type: 'string', example: 'Login OK' },
-//           token:   { type: 'string', example: 'eyJhbGciOiJI…' },
-//           user:    { $ref: '#/components/schemas/User' }
-//         }
-//       }
-//     }
-//   },
-//   security: [{ bearerAuth: [] }]
-// }
-
-// const options = {
-//   swaggerDefinition,
-//   apis: [
-//     './src/routes/*.ts',
-//     './src/controllers/*.ts'
-//   ]
-// };
-
-// const swaggerSpec = swaggerJsdoc(options);
-
-// export function setupSwagger(app: Application) {
-//   app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-// }
-
-

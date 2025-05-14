@@ -17,22 +17,44 @@ export async function parseAdsFromSheet(
   oAuthClient: OAuth2Client,
   sheetId: string
 ): Promise<ParsedAd[]> {
-  const sheets = google.sheets({ version:'v4', auth: oAuthClient });
-  const res    = await sheets.spreadsheets.values.get({
+  const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
+  const res = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
     range: 'Annoncer!A2:F'
   });
+
   const rows = res.data.values ?? [];
-  return rows.map((r,i) => ({
-    adGroup:    r[0] as string,
-    headline1:  r[1] as string,
-    headline2:  r[2] as string,
-    description:r[3] as string,
-    finalUrl:   r[4] as string,
-    path1:      r[5] as string,
-    rowIndex:   i+2
-  })).filter(a => a.adGroup && a.headline1 && a.description);
+
+  const parsed: (ParsedAd | null)[] = rows.map((r, i) => {
+    const adGroup     = r[0]?.trim() || '';
+    const headline1   = r[1]?.trim() || '';
+    const description = r[3]?.trim() || '';
+    const finalUrl    = r[4]?.trim() || '';
+
+    if (!adGroup || !headline1 || !description) {
+      console.warn(`Ignorerer række ${i + 2} – mangler obligatoriske felter`);
+      return null;
+    }
+
+    const ad: ParsedAd = {
+      adGroup,
+      headline1,
+      description,
+      finalUrl,
+      rowIndex: i + 2
+    };
+
+    // Kun tilføj valgfri felter hvis de findes
+    if (r[2]) ad.headline2 = r[2].trim();
+    if (r[5]) ad.path1 = r[5].trim();
+
+    return ad;
+  });
+
+  return parsed.filter((a): a is ParsedAd => a !== null);
 }
+
+
 
 export async function syncAdDefsFromSheet(
   oAuthClient: OAuth2Client,
@@ -40,25 +62,31 @@ export async function syncAdDefsFromSheet(
   userId: string
 ): Promise<ParsedAd[]> {
   const parsed = await parseAdsFromSheet(oAuthClient, sheetId);
+  console.log('Antal parsed ads:', parsed.length);
 
-  // Overskriv DB
   await AdDefModel.deleteMany({ sheetId, userId });
-  await AdDefModel.insertMany(parsed.map(a => ({
-    userId,
-    sheetId,
-    adGroup:     a.adGroup,
-    headline1:   a.headline1,
-    headline2:   a.headline2,
-    description: a.description,
-    finalUrl:    a.finalUrl,
-    path1:       a.path1,
-    path2:       a.path2,
-    rowIndex:    a.rowIndex,
-    createdAt:   new Date()
-  })));
+
+  try {
+    await AdDefModel.insertMany(parsed.map(a => ({
+      userId,
+      sheetId,
+      adGroup:     a.adGroup,
+      headline1:   a.headline1,
+      headline2:   a.headline2,
+      description: a.description,
+      finalUrl:    a.finalUrl,
+      path1:       a.path1,
+      path2:       a.path2,
+      rowIndex:    a.rowIndex,
+      createdAt:   new Date()
+    })), { ordered: false }); // fortsæt selv hvis én fejler
+  } catch (err) {
+    console.error('insertMany fejlede:', err);
+  }
 
   return parsed;
 }
+
 
 export async function updateAdRowInSheet(
   oAuthClient: OAuth2Client,

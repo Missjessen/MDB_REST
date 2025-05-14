@@ -18,21 +18,32 @@ export async function parseKeywordsFromSheet(
   oAuthClient: OAuth2Client,
   sheetId: string
 ): Promise<ParsedKeyword[]> {
-  const sheets = google.sheets({ version:'v4', auth: oAuthClient });
+  const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
     range: 'Keywords!A2:D'
   });
+
   const rows = res.data.values || [];
-  return rows
-    .map((r,i) => ({
-      adGroup:  r[0] as string,
-      keyword:  r[1] as string,
-      matchType: (r[2] as string).toUpperCase() as ParsedKeyword['matchType'],
-      cpc:      r[3] ? Number(r[3]) : undefined,
-      rowIndex: i+2
-    }))
-    .filter(k => k.adGroup && k.keyword);
+
+  return rows.map((r, i) => {
+    const adGroup   = r[0]?.trim() || '';
+    const keyword   = r[1]?.trim() || '';
+    const matchRaw  = r[2];
+    const matchType = typeof matchRaw === 'string' ? matchRaw.toUpperCase() : '';
+    const validMatch = ['BROAD', 'PHRASE', 'EXACT'].includes(matchType)
+      ? (matchType as ParsedKeyword['matchType'])
+      : 'BROAD'; // fallback
+    const cpc = r[3] && !isNaN(Number(r[3])) ? Number(r[3]) : undefined;
+
+    return {
+      adGroup,
+      keyword,
+      matchType: validMatch,
+      cpc,
+      rowIndex: i + 2
+    };
+  }).filter(k => k.adGroup && k.keyword);
 }
 
 export async function syncKeywordDefsFromSheet(

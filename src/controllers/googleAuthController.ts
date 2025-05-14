@@ -36,7 +36,8 @@ export const googleCallback: RequestHandler = async (req, res, next) => {
         _id: user._id.toString(),
         email: user.email,
         name: user.name,
-        picture: user.picture
+        picture: user.picture,
+        refreshToken: tokens.refresh_token 
       },
       process.env.JWT_SECRET!,
       { expiresIn: '7d' }

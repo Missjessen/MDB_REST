@@ -12,7 +12,7 @@ import sheetsRoutes from './routes/sheetsRoutes';
 import adRoutes from './routes/adRoutes';
 import keywordsRouter from './routes/keywordRoutes';
 import campaignDefsRoutes from './routes/campaignDefsRoutes';
-//import syncRouter from './routes/syncRoutes';
+import syncRouter from './routes/syncRoutes';
 import helmet from 'helmet'
 
 
@@ -132,7 +132,7 @@ app.use(express.urlencoded({ extended: true }));
     app.use('/api/ad-defs', adRoutes);
     app.use('/api/keyword-defs', keywordsRouter);
 
-    //app.use('/api/sheets/sync', syncRouter);
+    app.use('/api/sheets', syncRouter);
   
    
 

@@ -24,6 +24,7 @@ export const requireAuth: RequestHandler = (
       email: decoded.email,
       name: decoded.name,
       picture: decoded.picture,
+      refreshToken: decoded.refreshToken,
       iat: decoded.iat,
       exp: decoded.exp
     }

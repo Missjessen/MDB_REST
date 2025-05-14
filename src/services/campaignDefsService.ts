@@ -19,19 +19,39 @@ interface ParsedCampaign {
   rowIndex: number;
 }
 
-export async function parseCampaignsFromSheet(oauth:OAuth2Client, sheetId:string):Promise<ParsedCampaign[]> {
-  const sheets = google.sheets({version:'v4',auth:oauth});
-  const res = await sheets.spreadsheets.values.get({spreadsheetId:sheetId, range:'Kampagner!A2:E'});
-  const rows = res.data.values||[];
-  return rows
-    .map<ParsedCampaign>((r,i)=>({
-      name:String(r[0]||''),
-      status:((r[1]||'').toString().toUpperCase()==='PAUSED'?'PAUSED':'ENABLED'),
-      budget: r[2]!=null?Number(r[2]):undefined,
-      startDate:String(r[3]||''), endDate:String(r[4]||''), rowIndex:i+2
-    }))
-    .filter(c=>c.name&&c.status&&c.startDate&&c.endDate);
+export async function parseCampaignsFromSheet(
+  oauth: OAuth2Client,
+  sheetId: string
+): Promise<ParsedCampaign[]> {
+  const sheets = google.sheets({ version: 'v4', auth: oauth });
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: 'Kampagner!A2:E'
+  });
+
+  const rows = res.data.values || [];
+
+  return rows.map((r, i) => {
+    const name = r[0]?.trim() || '';
+    const statusRaw = r[1];
+    const status = (typeof statusRaw === 'string' && statusRaw.toUpperCase() === 'PAUSED'
+  ? 'PAUSED'
+  : 'ENABLED') as 'PAUSED' | 'ENABLED';
+    const budget = r[2] && !isNaN(Number(r[2])) ? Number(r[2]) : undefined;
+    const startDate = r[3]?.trim() || '';
+    const endDate = r[4]?.trim() || '';
+
+    return {
+      name,
+      status,
+      budget,
+      startDate,
+      endDate,
+      rowIndex: i + 2
+    };
+  }).filter(c => c.name && c.startDate && c.endDate);
 }
+
 
 export async function syncCampaignDefsFromSheet(
   oauth: OAuth2Client,
