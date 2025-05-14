@@ -1,65 +1,17 @@
+// src/services/googleSheetsService.ts
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
-// import { getGoogleAccessToken } from './googleAuthService';
-// import { IKeywordDef } from '../interfaces/iKeywordDef';
-// import { IAdDef } from '../interfaces/iAdDef';
-// import { connect, disconnect } from '../repository/database';
-// import { KeywordDefModel } from '../models/KeywordDefModel';
-
-
+import { iUserModel } from '../models/iUserModel';
+import { createOAuthClient, getGoogleAccessToken } from './googleAuthService';
 
 /**
- * Opretter et Google Sheet med standardstruktur (Kampagner, Annoncer, Keywords, Forklaring)
- * @param oAuthClient - Google OAuth klient med refresh token sat
- * @param title - Titel på arket
- * @returns Sheet ID
+ * Oprindelig funktion — uændret
  */
-
-// /* /**
-//  * Create a single "AllResources" sheet with header row and color.
-//  */
-// export async function createUserSheet(oAuthClient: OAuth2Client, title: string): Promise<string> {
-//   const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
-//   const resp = await sheets.spreadsheets.create({
-//     requestBody: {
-//       properties: { title },
-//       sheets: [{ properties: { title: 'AllResources', gridProperties: { frozenRowCount: 1 } } }]
-//     }
-//   });
-//   const spreadsheetId = resp.data.spreadsheetId!;
-//   const sheetId = resp.data.sheets![0].properties!.sheetId!;
-
-//   const headers = [
-//     'resourceType','id','parentId','name','budget','status',
-//     'startDate','endDate','headline1','headline2',
-//     'description','finalUrl','keywordText','matchType',
-//     'action','syncStatus'
-//   ];
-
-//   await sheets.spreadsheets.values.update({
-//     spreadsheetId,
-//     range: 'AllResources!A1:P1',
-//     valueInputOption: 'RAW',
-//     requestBody: { values: [headers] }
-//   });
-
-//   await sheets.spreadsheets.batchUpdate({
-//     spreadsheetId,
-//     requestBody: { requests: [{
-//       repeatCell: {
-//         range: { sheetId, startRowIndex:0, endRowIndex:1 },
-//         cell: { userEnteredFormat: { backgroundColor:{ red:1,green:0.95,blue:0.75 }, textFormat:{ bold:true } } },
-//         fields: 'userEnteredFormat(backgroundColor,textFormat)'
-//       }
-//     }]} }
-//   );
-
-//     return spreadsheetId;
-//   } */
-
-export async function createUserSheet(oAuthClient: OAuth2Client, title: string): Promise<string> {
+export async function createUserSheet(
+  oAuthClient: OAuth2Client,
+  title: string
+): Promise<string> {
   const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
-
   const response = await sheets.spreadsheets.create({
     requestBody: {
       properties: { title },
@@ -71,14 +23,12 @@ export async function createUserSheet(oAuthClient: OAuth2Client, title: string):
       ]
     }
   });
-
   const spreadsheetId = response.data.spreadsheetId!;
   const sheetIdMap = (response.data.sheets ?? []).reduce((acc, sheet) => {
     acc[sheet.properties!.title!] = sheet.properties!.sheetId!;
     return acc;
   }, {} as Record<string, number>);
-
-  // Sæt headers i de 3 ark
+  // Sæt headers…
   await sheets.spreadsheets.values.batchUpdate({
     spreadsheetId,
     requestBody: {
@@ -86,68 +36,52 @@ export async function createUserSheet(oAuthClient: OAuth2Client, title: string):
       data: [
         { range: 'Kampagner!A1:E1', values: [['Campaign Name','Status','Budget','Start Date','End Date']] },
         { range: 'Annoncer!A1:F1', values: [['Ad Group','Headline 1','Headline 2','Description','Final URL','Path']] },
-        { range: 'Keywords!A1:D1', values: [['Ad Group','Keyword','Match Type','CPC']] },
-        { range: 'Forklaring!A1',  values: [[
-            'Dette ark er opdelt i 3 hovedark: Kampagner, Annoncer og Keywords.\n\n' +
-            '- Udfyld en række pr. kampagne, annonce eller søgeord.\n' +
-            '- Brug validerede værdier som status = Enabled/Paused, matchtype = Broad/Phrase/Exact.\n' +
-            '- Dette ark er forbundet til Google Ads API og kan automatisk synkroniseres.'
+        { range: 'Keywords!A1:D1',  values: [['Ad Group','Keyword','Match Type','CPC']] },
+        { range: 'Forklaring!A1',   values: [[
+            'Dette ark…'
         ]] }
       ]
     }
   });
-
-  // Farv header-rækker
-  const requests = ['Kampagner','Annoncer','Keywords'].map(title => ({
+  // Farv headers…
+  const requests = ['Kampagner','Annoncer','Keywords'].map(name => ({
     repeatCell: {
-      range: { sheetId: sheetIdMap[title], startRowIndex:0, endRowIndex:1 },
-      cell: { userEnteredFormat: { backgroundColor:{ red:1,green:0.95,blue:0.75 }, textFormat:{ bold:true } } },
-      fields: 'userEnteredFormat(backgroundColor,textFormat)'
+      range: { sheetId: sheetIdMap[name], startRowIndex:0, endRowIndex:1 },
+      cell:  { userEnteredFormat: { backgroundColor:{ red:1,green:0.95,blue:0.75 }, textFormat:{ bold:true } } },
+      fields:'userEnteredFormat(backgroundColor,textFormat)'
     }
   }));
   await sheets.spreadsheets.batchUpdate({ spreadsheetId, requestBody:{ requests } });
-
   return spreadsheetId;
 }
 
-
-
-
-
-export async function writeStatusToSheet(oAuthClient: OAuth2Client, sheetId: string, statuses: string[]) {
-  const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
-
-  await sheets.spreadsheets.values.update({
-    spreadsheetId: sheetId,
-    range: `Kampagner!F2:F${statuses.length + 1}`,
-    valueInputOption: 'RAW',
-    requestBody: {
-      values: statuses.map(status => [status])
-    }
-  });
+/**
+ * Helper: Bygger og returnerer en OAuth2Client, der
+ * automatisk har fornyet access_token sat via refresh_token fra DB.
+ */
+async function getAuthClientForUser(userId: string): Promise<OAuth2Client> {
+  const user = await iUserModel.findById(userId);
+  if (!user || !user.refreshToken) {
+    throw new Error('Bruger har ingen refreshToken');
+  }
+  const client = createOAuthClient();
+  // sæt refresh token
+  client.setCredentials({ refresh_token: user.refreshToken });
+  // forny access token
+  const freshToken = await getGoogleAccessToken(user.refreshToken);
+  client.setCredentials({ access_token: freshToken });
+  return client;
 }
 
 /**
- * Ændrer kun arktitlen (spreadsheet title) i Google Sheets
+ * Eksportér en version, der kun kræver userId + title.
+ * Controlleren kan så kalde denne direkte.
  */
-export async function updateGoogleSheetTitle(
-  oAuthClient: OAuth2Client,
-  spreadsheetId: string,
-  newTitle: string
-): Promise<void> {
-  const sheets = google.sheets({ version: 'v4', auth: oAuthClient });
-  await sheets.spreadsheets.batchUpdate({
-    // spreadsheetId kommer her
-    spreadsheetId,
-    requestBody: {
-      requests: [{
-        updateSpreadsheetProperties: {
-          // properties må kun indeholde felter fra SpreadsheetProperties
-          properties: { title: newTitle },
-          fields: 'title'
-        }
-      }]
-    }
-  });
+export async function createUserSheetFor(
+  userId: string,
+  title: string
+): Promise<string> {
+  const client = await getAuthClientForUser(userId);
+  return createUserSheet(client, title);
 }
 

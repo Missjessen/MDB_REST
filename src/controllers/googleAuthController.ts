@@ -1,15 +1,11 @@
 // src/controllers/googleAuthController.ts
-
 import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
-//import { connect, disconnect } from '../repository/database';
-import { verifyGoogleCode, getAuthUrl } from '../services/googleAuthService';
-import { iUserModel } from '../models/iUserModel';
+import { getAuthUrl, verifyGoogleCode } from '../services/googleAuthService';
 import { AuthenticatedRequest } from '../interfaces/userReq';
-import { OAuth2Client } from 'google-auth-library';
 
 /**
- * Starter Google OAuth2‑flow.
+ * Starter Google OAuth2-flow.
  * Redirecter til Googles samtykkeskærm med alle SCOPES (Ads, Sheets, userinfo).
  */
 export const googleLogin: RequestHandler = (_req, res) => {
@@ -29,16 +25,10 @@ export const googleCallback: RequestHandler = async (req, res, next) => {
   }
 
   try {
-    // 1) Byt koden til Google‐tokens + bruger
+    // 1) Byt koden til Google-tokens + bruger
     const { user, tokens } = await verifyGoogleCode(code);
 
-    // 2) Log Google‐token direkte i terminalen
-    console.log('=== Google OAuth2 tokens ===');
-    console.log('access_token:', tokens.access_token);
-    console.log('refresh_token:', tokens.refresh_token);
-    console.log('expiry_date:', tokens.expiry_date);
-
-    // 3) Opret din egen JWT
+    // 2) Generér din JWT
     const jwtToken = jwt.sign(
       {
         _id:     user._id.toString(),
@@ -50,111 +40,47 @@ export const googleCallback: RequestHandler = async (req, res, next) => {
       { expiresIn: '7d' }
     );
 
-    // 4) Log også din egen JWT, hvis du vil
-    console.log('=== Din applikations JWT ===');
+    // 3) Log JWT’en i terminalen
+    console.log('─────────────────────────────');
+    console.log('🟢 Din applikations JWT-token:');
     console.log(jwtToken);
+    console.log('─────────────────────────────');
 
-    // 5) Svar browseren med noget simpelt – eller send JSON tilbage
+    // 4) Returnér JSON – ingen redirect til frontend
     res.json({
-      message: 'Login OK – tjek server‐terminal for tokens',
-      token:   jwtToken,
-      user
+      message:    'Login OK – se server-log for token',
+      token:       jwtToken,
+      user,
+      accessToken: tokens.access_token
     });
     return;
-
   } catch (err) {
     next(err);
     return;
   }
 };
 
-
 /**
  * Beskyttet endpoint: Henter oplysninger om den loggede bruger.
- * Forudsætter, at requireAuth har placeret JwtUserPayload i req.user.
+ * Forudsætter, at requireAuth-middleware har sat req.user.
  */
 export const getMe: RequestHandler = (req: AuthenticatedRequest, res) => {
   if (!req.user) {
-    res.status(401).json({ error: 'Ikke logget ind' })
-    return
+    res.status(401).json({ error: 'Ikke logget ind' });
+    return;
   }
+  const { email, name, picture, exp } = req.user;
+  res.json({ user: { email, name, picture, exp } });
+};
 
-  const { email, name, picture, exp } = req.user
-
-  res.json({
-    user: {
-      email,
-      name,
-      picture,
-      exp
-    }
-  })
-}
-// export const getMe: RequestHandler = (req: AuthenticatedRequest, res) => {
-//   if (!req.user) {
-//     res.status(401).json({ error: 'Ikke logget ind' });
-//     return;
-//   }
-//   res.json({ message: 'Du er logget ind ✅', user: req.user });
-// };
-
-export const logout: RequestHandler = (req, res) => {
-  // Fjern evt. cookie
+/**
+ * Logout: Her kan du evt. slette refresh token fra DB eller cookie.
+ */
+export const logout: RequestHandler = (_req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure:   process.env.NODE_ENV === 'production',
     sameSite: 'lax'
-  })
-
-  res.status(200).json({ message: 'Logout successful' })
-}
-
-
-// export const exchangeIdToken: RequestHandler = async (req, res, next) => {
-//   const { idToken } = req.body;
-//   if (!idToken) {
-//     res.status(400).json({ error: 'Manglende idToken' });
-//     return; 
-//   }
-
-//   try {
-//     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-//     const ticket = await client.verifyIdToken({
-//       idToken,
-//       audience: process.env.GOOGLE_CLIENT_ID,
-//     });
-//     const payload = ticket.getPayload();
-//     if (!payload) {
-//       res.status(400).json({ error: 'Ugyldigt idToken' });
-//       return;
-//     }
-
-//     let user = await iUserModel.findOne({ googleId: payload.sub });
-//     if (!user) {
-//       user = await iUserModel.create({
-//         email:     payload.email,
-//         googleId:  payload.sub,
-//         name:      payload.name,
-//         picture:   payload.picture,
-//       });
-//     }
-
-//     const appToken = jwt.sign(
-//       { _id: user._id.toString(), email: user.email },
-//       process.env.JWT_SECRET!,
-//       { expiresIn: '7d' }
-//     );
-
-//     res.json({
-//       message:     'Login OK',
-//       token:       appToken,
-//       accessToken: idToken,
-//       user
-//     });
-//     return;  
-
-//   } catch (err) {
-//     next(err);
-//     return;
-//   }
-// };
+  });
+  res.json({ message: 'Logout successful' });
+};
