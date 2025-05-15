@@ -10,7 +10,13 @@ import {
   deleteKeywordRowInSheet
 } from '../services/keywordDefsService';
 
-// GET /api/keyword-defs/:sheetId
+
+
+/**
+ * ==============================================================================================
+ * GET /api/keyword-defs/:sheetId
+ * ==============================================================================================
+ */
 export const getKeywordsForSheet: RequestHandler = async (req, res) => {
   const user = (req as AuthenticatedRequest).user!;
   const { sheetId } = req.params;
@@ -20,7 +26,7 @@ export const getKeywordsForSheet: RequestHandler = async (req, res) => {
     return;
   }
 
-  //await connect();
+ 
   try {
     const docs = await KeywordDefModel
       .find({ sheetId, userId: user._id })
@@ -31,12 +37,15 @@ export const getKeywordsForSheet: RequestHandler = async (req, res) => {
   } catch (err: any) {
     res.status(500).json({ error: err.message });
     return;
-  } //finally {
-    //await disconnect();
-  //}
+  } 
 };
 
-// PUT /api/keyword-defs/:sheetId/:keywordId
+
+/**
+ * ==============================================================================================
+ * PUT /api/keyword-defs/:sheetId/:keywordId
+ * ==============================================================================================
+ */
 export const updateKeyword: RequestHandler = async (req, res) => {
   const user = (req as AuthenticatedRequest).user!;
   const { sheetId, keywordId } = req.params;
@@ -47,7 +56,6 @@ export const updateKeyword: RequestHandler = async (req, res) => {
     return;
   }
 
-  //await connect();
   try {
     const doc = await KeywordDefModel.findOneAndUpdate(
       { _id: keywordId, sheetId, userId: user._id },
@@ -76,11 +84,14 @@ export const updateKeyword: RequestHandler = async (req, res) => {
   } catch (err: any) {
     res.status(500).json({ error: err.message });
     return;
-  } //finally {
-   // await disconnect();
-  //}
+  } 
 };
 
+/**
+ * ==============================================================================================
+ * DELETE /api/keyword-defs/:sheetId/:keywordId
+ * ==============================================================================================
+ */
 export const deleteKeyword: RequestHandler = async (req, res): Promise<void> => {
     const user = (req as AuthenticatedRequest).user;
     const { sheetId, keywordId } = req.params;
@@ -89,7 +100,7 @@ export const deleteKeyword: RequestHandler = async (req, res): Promise<void> => 
       return;
     }
   
-    //await connect();
+   
     try {
       // 1) Hent dokumentet inkl. rowIndex
       const doc = await KeywordDefModel
@@ -114,7 +125,7 @@ export const deleteKeyword: RequestHandler = async (req, res): Promise<void> => 
         await deleteKeywordRowInSheet(oauth, sheetId, rowIndex);
       } catch (err: any) {
         console.warn('Kunne ikke slette Keyword-række i Sheet:', err.message);
-        // Fortsæt alligevel til DB-slet
+        
       }
   
       // 4) Slet dokumentet i DB
@@ -123,13 +134,16 @@ export const deleteKeyword: RequestHandler = async (req, res): Promise<void> => 
   
     } catch (err: any) {
       res.status(500).json({ error: err.message });
-    } //finally {
-      //await disconnect();
-    //}
+    } 
   };
   
 
-// POST /api/keyword-defs/:sheetId/sync
+
+/**
+ * ==============================================================================================
+ * POST /api/keyword-defs/:sheetId/sync
+ * ==============================================================================================
+ */
 export const syncKeywords: RequestHandler = async (req, res) => {
   const user = (req as AuthenticatedRequest).user!;
   const { sheetId } = req.params;

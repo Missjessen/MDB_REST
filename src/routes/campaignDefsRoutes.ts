@@ -3,6 +3,11 @@ import express from 'express';
 import { requireAuth } from '../middleware/requireAuth';
 import * as ctrl from '../controllers/campaignDefsController';
 
+// █████████████████████████████████████████████████
+// █           Campaign ROUTES (CRUD)              █
+// █████████████████████████████████████████████████
+
+
 const campaignRouter = express.Router();
 
 // alle ruter er beskyttet

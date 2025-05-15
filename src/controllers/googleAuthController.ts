@@ -2,14 +2,14 @@
 
 import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
-//import { connect, disconnect } from '../repository/database';
 import { verifyGoogleCode, getAuthUrl } from '../services/googleAuthService';
-//import { iUserModel } from '../models/iUserModel';
 import { AuthenticatedRequest } from '../interfaces/userReq';
 
 /**
+ * ==============================================================================================
  * Starter Google OAuth2‑flow.
  * Redirecter til Googles samtykkeskærm med alle SCOPES (Ads, Sheets, userinfo).
+ * ==============================================================================================
  */
 export const googleLogin: RequestHandler = (_req, res) => {
   const url = getAuthUrl();
@@ -17,8 +17,10 @@ export const googleLogin: RequestHandler = (_req, res) => {
 };
 
 /**
+ * ==============================================================================================
  * Callback fra Google efter login.
  * Bytter kode til tokens, upserter bruger i Mongo, udsteder JWT inkl. tokens.
+ * ==============================================================================================
  */
 export const googleCallback: RequestHandler = async (req, res, next) => {
   const code = req.query.code as string;
@@ -64,8 +66,10 @@ export const googleCallback: RequestHandler = async (req, res, next) => {
 
 
 /**
+ * ==============================================================================================
  * Beskyttet endpoint: Henter oplysninger om den loggede bruger.
  * Forudsætter, at requireAuth har placeret JwtUserPayload i req.user.
+ * ==============================================================================================
  */
 export const getMe: RequestHandler = (req: AuthenticatedRequest, res) => {
   if (!req.user) {
@@ -84,14 +88,12 @@ export const getMe: RequestHandler = (req: AuthenticatedRequest, res) => {
     }
   })
 }
-// export const getMe: RequestHandler = (req: AuthenticatedRequest, res) => {
-//   if (!req.user) {
-//     res.status(401).json({ error: 'Ikke logget ind' });
-//     return;
-//   }
-//   res.json({ message: 'Du er logget ind ✅', user: req.user });
-// };
 
+/**
+ * ==============================================================================================
+ * Beskyttet endpoint: Logger brugeren ud ved at slette JWT fra browserens cookies.
+ * ==============================================================================================
+ */
 export const logout: RequestHandler = (req, res) => {
   // Fjern evt. cookie
   res.clearCookie('token', {

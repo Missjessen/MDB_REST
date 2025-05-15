@@ -1,19 +1,16 @@
 import express from 'express';
 import { requireAuth } from '../middleware/requireAuth';
-//import { syncSheetHandler } from '../controllers/syncSheetController';
 import * as ctrl from '../controllers/sheetsController';
-//import { syncAllFromSheet } from '../services/sheetService';
 
 
 
-
+// █████████████████████████████████████████████████
+// █           Sheets ROUTES (CRUD)                █
+// █████████████████████████████████████████████████
 
 
 const sheetsRouter = express.Router();
 
-// ─── CRUD for Sheets ────────────────────────────────────────────────────────
-
-// Kun loggede brugere må kalde disse endpoints
 sheetsRouter.use(requireAuth);
 
 /**

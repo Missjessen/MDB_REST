@@ -14,6 +14,15 @@ import { syncCampaignDefsFromSheet } from '../services/campaignDefsService';
 import { syncAdDefsFromSheet }       from '../services/adDefsService';
 import { syncKeywordDefsFromSheet }  from '../services/keywordDefsService';
 
+
+/**
+ * Synkroniserer data fra Google Sheets til Google Ads.
+ * Læser data fra arket og opdaterer kampagner, annoncegrupper, annoncer og kriterier i Google Ads.
+ * @param oAuthClient OAuth2Client til autentificering
+ * @param spreadsheetId ID for Google Sheets
+ * @param userId ID for brugeren
+ * @returns Liste af statusser for hver række
+ */
 export async function syncSheetToAds(
   oAuthClient: OAuth2Client,
   spreadsheetId: string,
@@ -95,6 +104,13 @@ export async function syncSheetToAds(
   return statuses;
 }
 
+/**
+ * Synkroniserer alle kampagner, annoncer og søgeord fra Google Sheets til Google Ads.
+ * @param oAuthClient OAuth2Client til autentificering
+ * @param sheetId ID for Google Sheets
+ * @param userId ID for brugeren
+ * @returns Antal synkroniserede kampagner, annoncer og søgeord
+ */
 export async function syncAllFromSheet(
   oAuthClient: OAuth2Client,
   sheetId:      string,

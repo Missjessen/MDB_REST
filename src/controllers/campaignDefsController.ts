@@ -1,6 +1,5 @@
 // src/controllers/campaignDefsController.ts
 import { RequestHandler } from 'express';
-//import { connect, disconnect } from '../repository/database';
 import { CampaignDefModel } from '../models/CampaignDefModel';
 import { AuthenticatedRequest } from '../interfaces/userReq';
 import { syncCampaignDefsFromSheet } from '../services/campaignDefsService';
@@ -8,7 +7,7 @@ import { createOAuthClient } from '../services/googleAuthService';
 import { updateCampaignRowInSheet, deleteCampaignRowInSheet } from '../services/campaignDefsService';
 
 /**
- * GET  /api/campaign-defs/:sheetId
+ * ======================== GET  /api/campaign-defs/:sheetId ========================
  */
 export const getCampaignsForSheet: RequestHandler = async (req, res) => {
   const user = (req as AuthenticatedRequest).user;
@@ -18,7 +17,6 @@ export const getCampaignsForSheet: RequestHandler = async (req, res) => {
     return;
   }
 
-  //await connect();
   try {
     const docs = await CampaignDefModel
       .find({ sheetId, userId: user._id })
@@ -28,13 +26,10 @@ export const getCampaignsForSheet: RequestHandler = async (req, res) => {
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   } 
-  //finally {
-    //await disconnect();
-  //}
 };
 
 /**
- * PUT  /api/campaign-defs/:sheetId/:campaignId
+ * ======================== PUT  /api/campaign-defs/:sheetId/:campaignId ========================
  */
 export const updateCampaign: RequestHandler = async (req, res) => {
     const user = (req as AuthenticatedRequest).user;
@@ -46,8 +41,8 @@ export const updateCampaign: RequestHandler = async (req, res) => {
       return;
     }
   
-    // 1) Opdater i Mongo og hent rowIndex
-    //await connect();
+    // 1) Opd. i Mongo og hent rowIndex
+  
     let doc;
     try {
       doc = await CampaignDefModel.findOneAndUpdate(
@@ -63,9 +58,7 @@ export const updateCampaign: RequestHandler = async (req, res) => {
       res.status(500).json({ error: err.message });
       return;
     } 
-    //finally {
-      //await disconnect();
-    //}
+    
   
     // 2) Opdater i Google Sheet på netop den række
     try {
@@ -92,7 +85,7 @@ export const updateCampaign: RequestHandler = async (req, res) => {
     return;
   };
 /**
- * DELETE  /api/campaign-defs/:sheetId/:campaignId
+ * ======================== DELETE  /api/campaign-defs/:sheetId/:campaignId ========================
  */
 export const deleteCampaign: RequestHandler = async (req, res) => {
     const user = (req as AuthenticatedRequest).user;
@@ -104,7 +97,6 @@ export const deleteCampaign: RequestHandler = async (req, res) => {
     }
   
     // 1) Hent rowIndex + slet dokument i Mongo
-    //await connect();
     let rowIndex: number;
     try {
       const doc = await CampaignDefModel.findOne({ _id: campaignId, sheetId, userId: user._id }).lean();
@@ -118,9 +110,7 @@ export const deleteCampaign: RequestHandler = async (req, res) => {
       res.status(500).json({ error: err.message });
       return;
     } 
-    //finally {
-      //await disconnect();
-    //}
+  
   
     // 2) Slet rækken i Google Sheet
     try {
@@ -137,8 +127,8 @@ export const deleteCampaign: RequestHandler = async (req, res) => {
   };
   
 /**
- * POST /api/campaign-defs/:sheetId/sync-db
- * Pull alle kampagner fra sheets og gemmer (overskriver) i DB
+ * ======================== POST /api/campaign-defs/:sheetId/sync-db ========================
+ * ======================== Pull alle kampagner fra sheets og gemmer (overskriver) i DB ========================
  */
 export const syncCampaignDefs: RequestHandler = async (req, res) => {
     const user = (req as AuthenticatedRequest).user;
@@ -146,14 +136,13 @@ export const syncCampaignDefs: RequestHandler = async (req, res) => {
   
     if (!user || !user.refreshToken) {
       res.status(401).json({ error: 'Login kræves' });
-      return;              // <= return void
+      return;             
     }
   
     // Opret OAuth-client
     const oauth = createOAuthClient();
     oauth.setCredentials({ refresh_token: user.refreshToken });
   
-    //await connect();
     try {
       const parsed = await syncCampaignDefsFromSheet(
         oauth,
@@ -161,12 +150,10 @@ export const syncCampaignDefs: RequestHandler = async (req, res) => {
         user._id.toString()
       );
       res.json({ synced: parsed.length, data: parsed });
-      return;            // <= return void
+      return;           
     } catch (err: any) {
       res.status(500).json({ error: err.message });
-      return;            // <= return void
+      return;         
     } 
-    //finally {
-      //await disconnect();
-    //}
+    
   };

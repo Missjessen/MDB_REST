@@ -3,6 +3,10 @@ import { Router } from 'express'
 import { requireAuth } from '../middleware/requireAuth'
 import * as ctrl       from '../controllers/adDefsController'
 
+// █████████████████████████████████████████████████
+// █           Ads ROUTES (CRUD)                   █
+// █████████████████████████████████████████████████
+
 const adRouter = Router()
 
 // Beskyt alle endpoints med JWT

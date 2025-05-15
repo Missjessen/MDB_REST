@@ -3,6 +3,11 @@ import { Router } from 'express';
 import { requireAuth } from '../middleware/requireAuth';
 import * as ctrl from '../controllers/keywordDefsController';
 
+// █████████████████████████████████████████████████
+// █           Keywords ROUTES (CRUD)              █
+// █████████████████████████████████████████████████
+
+
 const keywordsRouter = Router({ mergeParams: true });
 keywordsRouter.use(requireAuth);
 /**

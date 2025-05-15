@@ -1,12 +1,15 @@
-// ================================
-// services/adsService.ts
-// ================================
 import fetch from 'node-fetch';
-//import { Types } from 'mongoose';
+
 
 const GOOGLE_ADS_BASE = 'https://googleads.googleapis.com/v14';
 const CUSTOMER_ID = process.env.GOOGLE_ADS_CUSTOMER_ID;
 
+
+/**
+ * Mutate function for Google Ads API
+ * @param endpoint The endpoint to call (e.g., 'campaigns:mutate')
+ * @param operations The operations to perform
+ */
 async function mutate(endpoint: string, operations: any[]) {
   if (!operations.length) return;
   const url = `${GOOGLE_ADS_BASE}/customers/${CUSTOMER_ID}/${endpoint}`;

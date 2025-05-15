@@ -11,7 +11,7 @@ import { createOAuthClient } from '../services/googleAuthService';
 
 
 /**
- * GET /api/ad-defs/:sheetId
+ * ======================== GET /api/ad-defs/:sheetId ========================
  */
 export const getAdsForSheet: RequestHandler = async (req, res): Promise<void> => {
   const user = (req as AuthenticatedRequest).user!;
@@ -27,14 +27,14 @@ export const getAdsForSheet: RequestHandler = async (req, res): Promise<void> =>
 };
 
 /**
- * PUT /api/ad-defs/:sheetId/:adId
+ *  ======================== PUT /api/ad-defs/:sheetId/:adId========================
  */
 export const updateAd: RequestHandler = async (req, res): Promise<void> => {
   const user = (req as AuthenticatedRequest).user!;
   const { sheetId, adId } = req.params;
   const updates = req.body;
 
-  // 1) Opdater DB
+  // 1) Opd. DB
   const doc = await AdDefModel.findOneAndUpdate(
     { _id: adId, sheetId, userId: user._id },
     updates,
@@ -46,7 +46,7 @@ export const updateAd: RequestHandler = async (req, res): Promise<void> => {
     return;
   }
 
-  // 2) Opdater Google Sheet
+  // 2) Opd. Sheet
   try {
     const oauth = createOAuthClient();
     oauth.setCredentials({ refresh_token: user.refreshToken });
@@ -55,13 +55,13 @@ export const updateAd: RequestHandler = async (req, res): Promise<void> => {
     console.warn('Kunne ikke opdatere annonce-række i Sheet:', e.message);
   }
 
-  // 3) Returnér det opdaterede dokument
+  // 3) Retur opd. dokument
   res.json(doc);
   return;
 };
 
 /**
- * DELETE /api/ad-defs/:sheetId/:adId
+ * ======================== DELETE /api/ad-defs/:sheetId/:adId ========================
  */
 export const deleteAd: RequestHandler = async (req, res) => {
   const user = (req as AuthenticatedRequest).user!;
@@ -74,18 +74,17 @@ export const deleteAd: RequestHandler = async (req, res) => {
     .exec();
 
   if (!doc) {
-    // Hvis ingen dokument → 404
     res.status(404).json({ error: 'Annonce ikke fundet' });
     return;
   }
 
-  // 2) Guard: rowIndex SKAL være et tal
+  
   if (typeof doc.rowIndex !== 'number') {
     res.status(500).json({ error: 'Kan ikke finde række-index for annoncen' });
     return;
   }
 
-  // 3) Forsøg at slette rækken i Google Sheet
+ 
   try {
     const oauth = createOAuthClient();
     oauth.setCredentials({ refresh_token: user.refreshToken });
@@ -93,7 +92,7 @@ export const deleteAd: RequestHandler = async (req, res) => {
     await deleteAdRowInSheet(oauth, sheetId, doc.rowIndex);
   } catch (err: any) {
     console.warn('Kunne ikke slette annonce-række i Sheet:', err.message);
-    // Vi fortsætter alligevel, så annoncen slettes i DB
+    
   }
 
   // 4) Slet annoncen i DB
@@ -104,7 +103,7 @@ export const deleteAd: RequestHandler = async (req, res) => {
   return;
 };
 /**
- * POST /api/ad-defs/:sheetId/sync-db
+ * ======================== POST /api/ad-defs/:sheetId/sync-db ========================
  */
 export const syncAds: RequestHandler = async (req, res): Promise<void> => {
   const user = (req as AuthenticatedRequest).user!;
@@ -122,7 +121,7 @@ export const syncAds: RequestHandler = async (req, res): Promise<void> => {
 
   const parsed = await syncAdDefsFromSheet(oauth, sheetId, user._id.toString());
 
-  // 3) Returnér antal
+  // 3) Retur antal
   res.json({ synced: parsed.length });
   return;
 };

@@ -11,8 +11,8 @@ const iUserSchema = new Schema<IUser>({
   name:    { type: String }, 
   picture: { type: String },
 
-  googleAdsCustomerId: { type: String },  // valgfri
-  sheetId:             { type: String }   // valgfri
+  googleAdsCustomerId: { type: String },  
+  sheetId:             { type: String }   
 });
 
 export const iUserModel = model<IUser>('iUser', iUserSchema);

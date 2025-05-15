@@ -5,16 +5,17 @@ import { createUserSheet } from '../services/googleSheetsService';
 import { createOAuthClient } from '../services/googleAuthService';
 import { AuthenticatedRequest } from '../interfaces/userReq';
 import { google } from 'googleapis';
-//import { syncAllFromSheet } from '../services/sheetService';
-//import { syncSheetToAds } from '../services/syncSheetToAds';
 
 // ░▒▓██ get, post, put, delete (CRUD)██▓▒░
+
 /**
- * POST /api/sheets
+ * ==============================================================================================
+ * * POST /api/sheets
+ * ==============================================================================================
  */
 export const createSheet = async (
   req: AuthenticatedRequest,
-  res: Response, // Ensure Response type is explicitly defined
+  res: Response, 
   next: NextFunction
 ): Promise<void> => {
   try {
@@ -49,8 +50,11 @@ export const createSheet = async (
   }
 };
 
+
 /**
+ * ==============================================================================================
  * GET /api/sheets
+ * ==============================================================================================
  */
 export const getSheets = async (
   req: AuthenticatedRequest,
@@ -67,7 +71,9 @@ export const getSheets = async (
 };
 
 /**
+ * ==============================================================================================
  * GET /api/sheets/:sheetId
+ * ==============================================================================================
  */
 export const getSheetById = async (
   req: AuthenticatedRequest,
@@ -89,7 +95,9 @@ export const getSheetById = async (
 };
 
 /**
+ * ==============================================================================================
  * PUT /api/sheets/:sheetId
+ * ==============================================================================================
  */
 export const updateSheetById = async (
   req: AuthenticatedRequest,
@@ -134,7 +142,9 @@ export const updateSheetById = async (
 
 
 /**
+ * ==============================================================================================
  * DELETE /api/sheets/:sheetId
+ * ==============================================================================================
  */
 export const deleteSheetById = async (
   req: AuthenticatedRequest,

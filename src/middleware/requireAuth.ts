@@ -1,8 +1,14 @@
-// // src/middleware/requireAuth.ts
+// src/middleware/requireAuth.ts
 import { RequestHandler, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { AuthenticatedRequest, JwtUserPayload } from '../interfaces/userReq';
 
+/**
+ * ==============================================================================================
+ * Middleware til at beskytte ruter, der kræver autentificering.
+ * Kontrollerer, om JWT-token er gyldigt og tilføjer brugeroplysninger til anmodningen.
+ * ==============================================================================================
+ */
 export const requireAuth: RequestHandler = (
   req: AuthenticatedRequest,
   res: Response,

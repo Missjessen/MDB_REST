@@ -12,13 +12,12 @@ const CampaignDefSchema = new Schema<CampaignDefDoc>({
   startDate:  { type: String, required: true },
   endDate:    { type: String, required: true },
   budget:     { type: Number },
-  rowIndex:   { type: Number, required: true },   // NYT
+  rowIndex:   { type: Number, required: true },   
   createdAt:  { type: Date, default: () => new Date() }
 }, {
   collection: 'campaignDefs',
   versionKey: false
 });
 
-//CampaignDefSchema.index({ sheetId:1, campaignId:1 }, { unique: true });
 
 export const CampaignDefModel = model<CampaignDefDoc>('CampaignDef', CampaignDefSchema);

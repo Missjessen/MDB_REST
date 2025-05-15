@@ -4,8 +4,10 @@ import { OAuth2Client } from 'google-auth-library';
 import { iUserModel } from '../models/iUserModel';
 import { createOAuthClient, getGoogleAccessToken } from './googleAuthService';
 
+
 /**
- * Oprindelig funktion — uændret
+ * Opretter et nyt Google Sheet med de nødvendige ark og headers.
+ * Returnerer spreadsheetId.
  */
 export async function createUserSheet(
   oAuthClient: OAuth2Client,
@@ -55,9 +57,10 @@ export async function createUserSheet(
   return spreadsheetId;
 }
 
+
 /**
- * Helper: Bygger og returnerer en OAuth2Client, der
- * automatisk har fornyet access_token sat via refresh_token fra DB.
+ * Henter en OAuth2Client for en given bruger.
+ * Hvis brugeren ikke har et refresh token, kastes der en fejl.
  */
 async function getAuthClientForUser(userId: string): Promise<OAuth2Client> {
   const user = await iUserModel.findById(userId);
@@ -74,8 +77,10 @@ async function getAuthClientForUser(userId: string): Promise<OAuth2Client> {
 }
 
 /**
- * Eksportér en version, der kun kræver userId + title.
- * Controlleren kan så kalde denne direkte.
+ * Opretter et nyt Google Sheet for en given bruger.
+ * @param userId - ID for brugeren
+ * @param title - Titel på det nye Google Sheet
+ * @returns spreadsheetId for det oprettede Google Sheet
  */
 export async function createUserSheetFor(
   userId: string,

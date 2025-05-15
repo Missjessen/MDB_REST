@@ -28,7 +28,8 @@ export function createOAuthClient(): OAuth2Client {
 }
 
 /**
- * Genererer login-URL med de nødvendige scopes
+ * Genererer URL til Google OAuth2 login
+ * @returns URL til Google samtykkeskærm
  */
 export function getAuthUrl(): string {
   const client = createOAuthClient();
@@ -40,9 +41,11 @@ export function getAuthUrl(): string {
   });
 }
 
+
 /**
- * Verificerer callback-kode, henter tokens og gemmer/oppdaterer bruger
- * Returnerer det opdaterede brugerobjekt + tokens
+ * Verificerer Google login kode og opretter/uppdaterer bruger i MongoDB
+ * @param code - Koden fra Google OAuth2 callback
+ * @returns Brugerobjekt og tokens fra Google
  */
 export async function verifyGoogleCode(code: string) {
   const client = createOAuthClient();
@@ -84,8 +87,11 @@ return {
 }
 }
 
+
 /**
- * Henter nyt access token fra gemt refresh token
+ * Henter Google Ads API-klient for en bruger
+ * @param user - Bruger med Google Ads adgang
+ * @returns En autoriseret kundeinstans fra GoogleAdsApi
  */
 export async function getGoogleAccessToken(refreshToken: string): Promise<string> {
   const client = createOAuthClient();

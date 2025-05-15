@@ -2,8 +2,6 @@
 import { Schema, model, Document } from 'mongoose';
 import { IAdDef } from '../interfaces/iAdDef';
 
-// Omit<IAdDef,'_id'> fjerner _id fra dit interface,
-// så Document kun kommer med den én gang.
 export interface AdDefDoc extends Omit<IAdDef,'_id'>, Document {}
 
 
@@ -27,7 +25,7 @@ const AdDefSchema = new Schema<AdDefDoc>(
   }
 );
 
-// Undgå dubletter per sheet+adGroup+headline1+description
+// Undgå dubletter 
 AdDefSchema.index(
   { sheetId:1, adGroup:1, headline1:1, description:1 },
   { unique: true }

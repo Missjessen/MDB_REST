@@ -5,7 +5,8 @@ import { KeywordDefModel } from '../models/keywordDefModel';
 import { google } from 'googleapis';
 
 
-// 1) parseKeywordsFromSheet – læs Keywords!A2:D, returnér også rowIndex
+
+// 1) parseKeywordsFromSheet – læs keywords fra Google Sheets
 interface ParsedKeyword {
   adGroup:   string;
   keyword:   string;
@@ -14,6 +15,12 @@ interface ParsedKeyword {
   rowIndex:  number;
 }
 
+/**
+ * Læs keywords fra Google Sheets og returnér dem som ParsedKeyword objekter.
+ * @param oAuthClient OAuth2Client til autentificering
+ * @param sheetId ID for Google Sheet
+ * @returns Liste af ParsedKeyword objekter
+ */
 export async function parseKeywordsFromSheet(
   oAuthClient: OAuth2Client,
   sheetId: string
@@ -46,6 +53,8 @@ export async function parseKeywordsFromSheet(
   }).filter(k => k.adGroup && k.keyword);
 }
 
+
+// 2) syncKeywordDefsFromSheet – opdater DB med keywords fra Google Sheets
 export async function syncKeywordDefsFromSheet(
   oAuthClient: OAuth2Client,
   sheetId: string,

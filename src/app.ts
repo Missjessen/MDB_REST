@@ -3,28 +3,16 @@ import cookieParser from 'cookie-parser';
 import express, { Application } from "express";
 import dotenvFlow from "dotenv-flow";
 import cors from "cors";  
-//import { connect } from "./repository/database";
 import router from "./routes";
 import { setupSwagger } from "./util/documentationSwag";
 import authRoutes from './routes/authRoutes';
-
 import sheetsRoutes from './routes/sheetsRoutes';
 import adRoutes from './routes/adRoutes';
 import keywordsRouter from './routes/keywordRoutes';
 import campaignDefsRoutes from './routes/campaignDefsRoutes';
 import syncRouter from './routes/syncRoutes';
-import helmet from 'helmet'
-
-
-
-
-//import deployRoutes from './routes/deployRoutes';
-
+import helmet from 'helmet';
 import { generalLimiter } from './middleware/rateLimiter';
-
-
-
-
 
 import dotenv from 'dotenv';
 
@@ -38,9 +26,8 @@ const app: Application = express();
 
 
 // ======================== CORS SETUP ========================
-// src/app.ts
 
-// 1) Hent ALLOWED_ORIGINS fra .env
+
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
   .map(o => o.trim())
@@ -50,7 +37,7 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
 const port = process.env.PORT || 4000;
 const serverOrigin = `http://localhost:${port}`;
 
-// 3) Sørg for at vores server-origin altid er tilladt
+
 if (!allowedOrigins.includes(serverOrigin)) {
   allowedOrigins.push(serverOrigin);
 }
@@ -58,7 +45,6 @@ if (!allowedOrigins.includes(serverOrigin)) {
 // 4) Sæt CORS-middleware op
 app.use(cors({
   origin(origin, callback) {
-    // tillad Postman (ingen origin header), vores server‐origin og evt. andre fra env
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -81,8 +67,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 
 // ======================== SERVER START ========================
-// export function startServer() {
-//     testConnection();
 
     // Handle preflight requests
     app.options("*", cors());
@@ -121,7 +105,7 @@ app.use(express.urlencoded({ extended: true }));
     
 
     // Route setup
-    app.use(cookieParser()); // req.cookies
+    app.use(cookieParser()); 
     app.use("/api", router); 
     app.use('/auth', authRoutes);
   

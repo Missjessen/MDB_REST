@@ -3,6 +3,11 @@ import { Router } from 'express';
 import { requireAuth } from '../middleware/requireAuth';
 import * as ctrl from '../controllers/syncSheetController';
 
+// █████████████████████████████████████████████████
+// █           Sync. ROUTES                        █
+// █████████████████████████████████████████████████
+
+
 const syncRouter = Router();
 syncRouter.use(requireAuth);
 

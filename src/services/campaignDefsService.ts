@@ -19,6 +19,10 @@ interface ParsedCampaign {
   rowIndex: number;
 }
 
+/**
+ * Parser kampagner fra Google Sheets.
+ * Returnerer en liste af ParsedCampaigns.
+ */
 export async function parseCampaignsFromSheet(
   oauth: OAuth2Client,
   sheetId: string
@@ -52,7 +56,13 @@ export async function parseCampaignsFromSheet(
   }).filter(c => c.name && c.startDate && c.endDate);
 }
 
-
+/**
+ * Synkroniser kampagner fra Google Sheets til DB.
+ * @param oauth OAuth2Client til autentificering
+ * @param sheetId ID for Google Sheet
+ * @param userId ID for bruger
+ * @returns Liste af ParsedCampaigns
+ */
 export async function syncCampaignDefsFromSheet(
   oauth: OAuth2Client,
   sheetId: string,
@@ -81,11 +91,14 @@ export async function syncCampaignDefsFromSheet(
 }
 
   
-  /**
-   * Opdater én celle-per-kolonne i rækken i arket.
-   */
-  // src/services/googleSheets/campaignSheetService.ts
 
+/**
+ * Opdaterer en enkelt række i Google Sheets.
+ * @param oAuthClient OAuth2Client til autentificering
+ * @param sheetId ID for Google Sheet
+ * @param rowIndex Indeks for række der skal opdateres
+ * @param updates Opdateringer til rækken
+ */
 export async function updateCampaignRowInSheet(
     oAuthClient: OAuth2Client,
     sheetId: string,
@@ -108,7 +121,12 @@ export async function updateCampaignRowInSheet(
     }
   }
   
-  export async function deleteCampaignRowInSheet(
+/**
+ * Sletter en enkelt række i Google Sheets.
+ * @param oAuthClient OAuth2Client til autentificering
+ * @param sheetId ID for Google Sheet
+ */
+export async function deleteCampaignRowInSheet(
     oAuthClient: OAuth2Client,
     sheetId: string,
     rowIndex: number

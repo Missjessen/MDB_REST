@@ -21,7 +21,7 @@ const KeywordDefSchema = new Schema<KeywordDefDoc>(
   }
 );
 
-// Undgå dubletter per sheet+adGroup+keyword
+// Undgå dubletter 
 KeywordDefSchema.index({ sheetId: 1, adGroup: 1, keyword: 1 }, { unique: true });
 
 export const KeywordDefModel = model<KeywordDefDoc>('KeywordDef', KeywordDefSchema);

@@ -2,6 +2,13 @@ import { OAuth2Client } from 'google-auth-library';
 import { google } from 'googleapis';
 import { AdDefModel } from '../models/adDefModel';
 
+
+/**
+ * ==============================================================================================
+  * AdDefService
+ * ==============================================================================================
+ */
+
 interface ParsedAd {
   adGroup:   string;
   headline1: string;
@@ -12,7 +19,12 @@ interface ParsedAd {
   path2?:    string;
   rowIndex:  number;
 }
-
+/**
+ * Læs annoncer fra Google Sheets og returnér dem som ParsedAd objekter.
+ * @param oAuthClient OAuth2Client til autentificering
+ * @param sheetId ID for Google Sheet
+ * @returns Liste af ParsedAd objekter
+ */
 export async function parseAdsFromSheet(
   oAuthClient: OAuth2Client,
   sheetId: string
@@ -54,8 +66,13 @@ export async function parseAdsFromSheet(
   return parsed.filter((a): a is ParsedAd => a !== null);
 }
 
-
-
+/**
+ * Synkroniser annoncer fra Google Sheets til MongoDB.
+ * @param oAuthClient OAuth2Client til autentificering
+ * @param sheetId ID for Google Sheet
+ * @param userId ID for bruger
+ * @returns Liste af ParsedAd objekter
+ */
 export async function syncAdDefsFromSheet(
   oAuthClient: OAuth2Client,
   sheetId: string,
@@ -87,7 +104,13 @@ export async function syncAdDefsFromSheet(
   return parsed;
 }
 
-
+/**
+ * Opdater en annonce i Google Sheets.
+ * @param oAuthClient OAuth2Client til autentificering
+ * @param sheetId ID for Google Sheet
+ * @param adId ID for annoncen
+ * @param updates Opdateringer til annoncen
+ */
 export async function updateAdRowInSheet(
   oAuthClient: OAuth2Client,
   sheetId: string,

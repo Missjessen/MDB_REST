@@ -8,7 +8,7 @@ import { createTestAccount } from '../services/googleAds/createTestAccount';
 
 
 /**
- * Opretter en testkonto i Google Ads (sandbox-miljø)
+ * ======================== Opretter en testkonto i Google Ads (sandbox-miljø) ========================
  * @route POST /api/ads/create-test-account
  */
 export const createGoogleAdsTestAccount = async (req: Request, res: Response): Promise<void> => {
@@ -29,7 +29,7 @@ export const createGoogleAdsTestAccount = async (req: Request, res: Response): P
     }
   
     try {
-      //await connect();
+      
       const updatedUser = await iUserModel.findByIdAndUpdate(
         userId,
         { googleAdsCustomerId },
@@ -45,15 +45,13 @@ export const createGoogleAdsTestAccount = async (req: Request, res: Response): P
     } catch (error) {
       res.status(500).json({ error: 'Fejl ved opdatering af Ads ID: ' + error });
     } 
-    //finally {
-      //await disconnect();
-    //}
+  
   };
   
 
   export const getCustomerList = async (req: Request, res: Response): Promise<void> => {
     try {
-      //await connect();
+      
       const customers = await iUserModel.find({}, 'email googleAdsCustomerId');
   
       if (!customers || customers.length === 0) {
@@ -64,9 +62,7 @@ export const createGoogleAdsTestAccount = async (req: Request, res: Response): P
       res.status(200).json(customers);
     } catch (error) {
       res.status(500).json({ error: "Fejl ved hentning af kunder: " + error });
-    } //finally {
-      //await disconnect();
-    //}
+    } 
   };
   
 
