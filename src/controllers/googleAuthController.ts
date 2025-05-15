@@ -37,30 +37,29 @@ export const googleCallback: RequestHandler = async (req, res, next) => {
         email: user.email,
         name: user.name,
         picture: user.picture,
-        refreshToken: tokens.refresh_token 
+        refreshToken: tokens.refresh_token
       },
       process.env.JWT_SECRET!,
       { expiresIn: '7d' }
     );
 
-    console.log('Generated JWT Token:', jwtToken);
-     // Log Google-tokens (valgfrit)
-     console.log('access_token:', tokens.access_token);
-     console.log('refresh_token:', tokens.refresh_token);
-     console.log('expiry_date:', tokens.expiry_date);
+    console.log('✅ JWT oprettet:', jwtToken);
 
-    // ✅ VIGTIGT: Ingen return her – bare send JSON
     res.json({
-      message: 'Login OK',
       token: jwtToken,
-      user,
-      accessToken: tokens.access_token
+      user: {
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        picture: user.picture
+      }
     });
-
   } catch (err) {
+    console.error('❌ Google callback fejl:', err);
     next(err);
   }
 };
+
 
 
 
